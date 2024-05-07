@@ -23,17 +23,21 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="Chart/ChartPage"
+        name="ChartPage"
         options={{
           title: "Chart",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="line-chart" color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="Calendar/CalendarPage"
+        name="index"
         options={{
-          title: "Tab On",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: "Calendar",
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="calendar" color={color} />
+          ),
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
