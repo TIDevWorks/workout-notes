@@ -1,5 +1,5 @@
-import { useColorScheme } from "@/components/useColorScheme";
 import { checkUUID } from "@/helper/checkUUID";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   DarkTheme,
@@ -12,16 +12,16 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 export {
-  // Catch any errors thrown by the Layout component.
+  // Layoutコンポーネントによって投げられたエラーをキャッチする
   ErrorBoundary,
 } from "expo-router";
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
+  // modalでリロードしても戻るボタンが表示されるようにする
   initialRouteName: "(tabs)",
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// アセットのロードが完了する前にスプラッシュ画面が自動で隠れないようにする
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -40,6 +40,7 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
+  // アプリ起動時にAsyncStrageにUUIDが存在するかチェック
   useEffect(() => {
     checkUUID();
   }, []);

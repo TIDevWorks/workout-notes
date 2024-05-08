@@ -1,7 +1,7 @@
 import { Dimensions, StyleSheet, View } from "react-native";
 import { CalendarList } from "react-native-calendars";
 
-export default function CalendarPage() {
+export default function Calendar() {
   const deviceWidth = Dimensions.get("window").width;
 
   return (

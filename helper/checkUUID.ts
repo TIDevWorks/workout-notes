@@ -27,7 +27,6 @@ const generateAndStoreUUID = async () => {
 export const checkUUID = async () => {
   try {
     const value = await AsyncStorage.getItem("@uuid");
-    console.log(value);
     if (value === null) {
       generateAndStoreUUID();
     }
