@@ -31,6 +31,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
     borderRadius: 50,
     overflow: "hidden",
-    elevation: 8,
+    elevation: 4,
   },
 });

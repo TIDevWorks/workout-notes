@@ -1,10 +1,10 @@
 import { Text, View } from "@/components/Themed";
 import { StyleSheet } from "react-native";
 
-export default function ChartPage() {
+export default function OtherPage() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Chart</Text>
+      <Text style={styles.title}>Other</Text>
     </View>
   );
 }

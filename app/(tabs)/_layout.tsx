@@ -22,6 +22,15 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="OtherPage"
+        options={{
+          title: "Other",
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="info-circle" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="ChartPage"
         options={{
           title: "Chart",
@@ -38,7 +47,7 @@ export default function TabLayout() {
             <TabBarIcon name="calendar" color={color} />
           ),
           headerRight: () => (
-            <Link href="/modal" asChild>
+            <Link href="/modals/modal" asChild>
               <Pressable>
                 {({ pressed }) => (
                   <FontAwesome
