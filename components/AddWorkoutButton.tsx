@@ -14,6 +14,7 @@ const AddWorkoutButton = () => {
                 name="plus-circle"
                 size={25}
                 style={{ opacity: pressed ? 0.5 : 1 }}
+                color={"#fff"}
               />
             </View>
           )}
@@ -26,12 +27,10 @@ const AddWorkoutButton = () => {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 2,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#3A9DE0",
     borderRadius: 50,
-    marginHorizontal: "10%",
-    marginVertical: 18,
+    marginHorizontal: "20%",
+    marginBottom: "5%",
     elevation: 4,
   },
   buttonContent: {
@@ -40,7 +39,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   text: {
-    color: "#000",
+    color: "#fff",
     marginRight: 15,
   },
 });

@@ -24,11 +24,10 @@ export default function Calendar() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     marginHorizontal: "5%",
+    marginTop: "5%",
   },
   calendarContainer: {
-    marginTop: 15,
     borderRadius: 50,
     overflow: "hidden",
     elevation: 4,

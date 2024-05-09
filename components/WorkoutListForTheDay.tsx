@@ -4,7 +4,16 @@ export default function WorkoutList() {
   return (
     <View style={styles.container}>
       <View style={styles.workoutList}>
-        <Text>a</Text>
+        <Text>ベンチプレス</Text>
+      </View>
+      <View style={styles.workoutList}>
+        <Text>スクワット</Text>
+      </View>
+      <View style={styles.workoutList}>
+        <Text>デッドリフト</Text>
+      </View>
+      <View style={styles.workoutList}>
+        <Text>チェストプレス</Text>
       </View>
     </View>
   );
@@ -12,13 +21,15 @@ export default function WorkoutList() {
 
 const styles = StyleSheet.create({
   container: {
+    marginVertical: "5%",
+    backgroundColor: "#fff",
     flex: 1,
-    marginHorizontal: "5%",
   },
   workoutList: {
+    alignItems: "center",
     justifyContent: "center",
-    marginTop: 15,
-    borderRadius: 50,
-    elevation: 4,
+    paddingVertical: "5%",
+    borderColor: "#E9E7FD",
+    borderBottomWidth: 1,
   },
 });
