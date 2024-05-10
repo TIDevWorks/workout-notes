@@ -1,3 +1,4 @@
+import { generateDefaultWorkouts } from "@/helper/generateDefaultWorkouts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Updates from "expo-updates";
 import { Alert } from "react-native";
@@ -18,6 +19,8 @@ const generateAndStoreUUID = async () => {
 
   try {
     await AsyncStorage.setItem("@uuid", newUuid);
+    // 初回アプリ起動時、デフォルトのトレーニング種目を生成
+    await generateDefaultWorkouts();
   } catch (e) {
     console.error(e);
     showAlert("UUIDの生成と保存に失敗しました。アプリを再起動してください。");

@@ -22,8 +22,10 @@ export default function WorkoutList() {
 const styles = StyleSheet.create({
   container: {
     marginVertical: "5%",
-    backgroundColor: "#fff",
     flex: 1,
+    borderWidth: 1,
+    borderColor: "#E9E7FD",
+    backgroundColor: "#fff",
   },
   workoutList: {
     alignItems: "center",
