@@ -1,7 +1,7 @@
-import { View, StyleSheet } from "react-native";
-import AddWorkoutButton from "@/components/AddWorkoutButton";
-import Calendar from "@/components/Calendar";
-import WorkoutList from "@/components/WorkoutListForTheDay";
+import { View, StyleSheet } from 'react-native';
+import AddWorkoutButton from '@/components/AddWorkoutButton';
+import Calendar from '@/components/Calendar';
+import WorkoutList from '@/components/WorkoutListForTheDay';
 
 export default function Index() {
   return (
@@ -16,7 +16,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "column",
-    justifyContent: "space-between",
+    flexDirection: 'column',
+    justifyContent: 'space-between',
   },
 });

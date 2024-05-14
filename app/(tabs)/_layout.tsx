@@ -1,11 +1,11 @@
-import Colors from "@/constants/Colors";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs } from "expo-router";
-import React from "react";
-import { Pressable, useColorScheme } from "react-native";
+import Colors from '@/constants/Colors';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Tabs } from 'expo-router';
+import React from 'react';
+import { Pressable, useColorScheme } from 'react-native';
 
 function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
+  name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
 }) {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
@@ -17,13 +17,13 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
       }}
     >
       <Tabs.Screen
         name="OtherPage"
         options={{
-          title: "Other",
+          title: 'Other',
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="info-circle" color={color} />
           ),
@@ -32,7 +32,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="ChartPage"
         options={{
-          title: "Chart",
+          title: 'Chart',
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="line-chart" color={color} />
           ),
@@ -41,7 +41,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Calendar",
+          title: 'Calendar',
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="calendar" color={color} />
           ),
@@ -51,7 +51,7 @@ export default function TabLayout() {
                 <FontAwesome
                   name="info-circle"
                   size={25}
-                  color={Colors[colorScheme ?? "light"].text}
+                  color={Colors[colorScheme ?? 'light'].text}
                   style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                 />
               )}

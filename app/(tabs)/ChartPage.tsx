@@ -1,5 +1,5 @@
-import { Text, View } from "@/components/Themed";
-import { StyleSheet } from "react-native";
+import { Text, View } from '@/components/Themed';
+import { StyleSheet } from 'react-native';
 
 export default function ChartPage() {
   return (
@@ -12,12 +12,12 @@ export default function ChartPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "white",
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
   },
   title: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 });

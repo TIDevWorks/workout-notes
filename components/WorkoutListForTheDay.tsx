@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text } from 'react-native';
 
 export default function WorkoutList() {
   return (
@@ -21,17 +21,17 @@ export default function WorkoutList() {
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: "5%",
+    marginVertical: '5%',
     flex: 1,
     borderWidth: 1,
-    borderColor: "#E9E7FD",
-    backgroundColor: "#fff",
+    borderColor: '#E9E7FD',
+    backgroundColor: '#fff',
   },
   workoutList: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: "5%",
-    borderColor: "#E9E7FD",
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: '5%',
+    borderColor: '#E9E7FD',
     borderBottomWidth: 1,
   },
 });

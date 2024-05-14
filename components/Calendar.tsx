@@ -1,8 +1,8 @@
-import { Dimensions, StyleSheet, View } from "react-native";
-import { CalendarList } from "react-native-calendars";
+import { Dimensions, StyleSheet, View } from 'react-native';
+import { CalendarList } from 'react-native-calendars';
 
 export default function Calendar() {
-  const deviceWidth = Dimensions.get("window").width;
+  const deviceWidth = Dimensions.get('window').width;
 
   return (
     <View style={styles.container}>
@@ -24,12 +24,12 @@ export default function Calendar() {
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: "5%",
-    marginTop: "5%",
+    marginHorizontal: '5%',
+    marginTop: '5%',
   },
   calendarContainer: {
     borderRadius: 50,
-    overflow: "hidden",
+    overflow: 'hidden',
     elevation: 4,
   },
 });
