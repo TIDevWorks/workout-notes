@@ -1,8 +1,10 @@
-import Colors from '@/constants/Colors';
+import React, { useEffect, useState } from 'react';
+import { useColorScheme } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
-import React from 'react';
-import { Pressable, useColorScheme } from 'react-native';
+import Colors from '@/constants/Colors';
+import { getTheme, setTheme } from '@/helper/checkTheme';
+import HeaderRight from '@/components/HeaderRight';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -12,12 +14,33 @@ function TabBarIcon(props: {
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const systemColorScheme = useColorScheme();
+  const [theme, setThemeState] = useState<'light' | 'dark'>(
+    systemColorScheme ?? 'light',
+  );
+  const [icon, setIcon] = useState<'sun-o' | 'moon-o'>('sun-o');
+
+  useEffect(() => {
+    const fetchTheme = async () => {
+      const storedTheme = await getTheme();
+      setThemeState(storedTheme);
+      setIcon(storedTheme === 'light' ? 'sun-o' : 'moon-o');
+    };
+
+    fetchTheme();
+  }, []);
+
+  const toggleTheme = async () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setThemeState(newTheme);
+    setIcon(newTheme === 'light' ? 'sun-o' : 'moon-o');
+    await setTheme(newTheme);
+  };
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[theme].tint,
       }}
     >
       <Tabs.Screen
@@ -27,6 +50,9 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="info-circle" color={color} />
           ),
+          headerRight: () => (
+            <HeaderRight icon={icon} theme={theme} toggleTheme={toggleTheme} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -35,6 +61,9 @@ export default function TabLayout() {
           title: 'Chart',
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="line-chart" color={color} />
+          ),
+          headerRight: () => (
+            <HeaderRight icon={icon} theme={theme} toggleTheme={toggleTheme} />
           ),
         }}
       />
@@ -46,16 +75,7 @@ export default function TabLayout() {
             <TabBarIcon name="calendar" color={color} />
           ),
           headerRight: () => (
-            <Pressable>
-              {({ pressed }) => (
-                <FontAwesome
-                  name="info-circle"
-                  size={25}
-                  color={Colors[colorScheme ?? 'light'].text}
-                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                />
-              )}
-            </Pressable>
+            <HeaderRight icon={icon} theme={theme} toggleTheme={toggleTheme} />
           ),
         }}
       />
