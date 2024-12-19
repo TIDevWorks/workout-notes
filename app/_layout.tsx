@@ -36,7 +36,6 @@ export default function RootLayout() {
         }
       } catch (e) {
         console.error('App initialization error:', e);
-        // クリティカルなエラーの場合のみユーザーに通知
         Alert.alert('エラー', 'アプリの初期化に失敗しました。');
       }
     };
@@ -53,6 +52,13 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
+        <Stack.Screen
+          name="modals/WorkoutList"
+          options={{
+            title: 'Select Workout',
+            presentation: 'modal',
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );
