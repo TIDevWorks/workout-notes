@@ -1,6 +1,6 @@
+// checkUUID.ts
 import { generateDefaultWorkouts } from '@/helper/generateDefaultWorkouts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Updates from 'expo-updates';
 import { Alert } from 'react-native';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
@@ -8,33 +8,36 @@ import { v4 as uuidv4 } from 'uuid';
 const showAlert = (errorMessage: string) => {
   Alert.alert('エラー', errorMessage, [
     {
-      text: 'OK',
-      onPress: () => Updates.reloadAsync(),
+      text: 'リトライ',
+      onPress: () => checkUUID(),
     },
   ]);
 };
 
 const generateAndStoreUUID = async () => {
-  const newUuid = await uuidv4();
+  const newUuid = uuidv4();
 
   try {
     await AsyncStorage.setItem('@uuid', newUuid);
-    // 初回アプリ起動時、デフォルトのトレーニング種目を生成
-    await generateDefaultWorkouts();
+    await generateDefaultWorkouts(newUuid);
+    return true;
   } catch (e) {
-    console.error(e);
-    showAlert('UUIDの生成と保存に失敗しました。アプリを再起動してください。');
+    console.error('UUID generation error:', e);
+    showAlert('初期設定に失敗しました。もう一度試してください。');
+    return false;
   }
 };
 
-export const checkUUID = async () => {
+export const checkUUID = async (): Promise<boolean> => {
   try {
     const value = await AsyncStorage.getItem('@uuid');
     if (value === null) {
-      generateAndStoreUUID();
+      return await generateAndStoreUUID();
     }
+    return true;
   } catch (e) {
-    console.error(e);
-    showAlert('UUIDの確認に失敗しました。アプリを再起動してください。');
+    console.error('UUID check error:', e);
+    showAlert('UUIDの確認に失敗しました。もう一度試してください。');
+    return false;
   }
 };
