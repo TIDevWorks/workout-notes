@@ -60,6 +60,9 @@ export interface WorkoutLog {
   createdAt: number;
 }
 
+/** 記録の値（重量・回数・セット数） */
+export type WorkoutValues = Pick<WorkoutLog, 'weight' | 'reps' | 'sets'>;
+
 /**
  * 記録の種目名。種目の今の名前（nameById）を優先し、無ければ記録時の名前、それも無ければ ID。
  * 種目名を変更すると過去の記録の表示も新しい名前になる。

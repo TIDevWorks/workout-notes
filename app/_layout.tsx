@@ -70,6 +70,10 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="logs/[id]"
+          options={{ title: '記録の編集', headerBackTitle: '戻る' }}
+        />
+        <Stack.Screen
           name="trainings/index"
           options={{ title: '種目の管理', headerBackTitle: '戻る' }}
         />

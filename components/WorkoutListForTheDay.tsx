@@ -1,4 +1,5 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Palette, Shadow } from '@/constants/Colors';
 import {
   WorkoutLog,
@@ -16,7 +17,7 @@ type WorkoutListProps = {
   error: boolean;
 };
 
-/** Calendar 画面の、選択した日の記録一覧 */
+/** Calendar 画面の、選択した日の記録一覧。タップで記録の編集画面を開く */
 export default function WorkoutList({
   workouts,
   nameById,
@@ -32,7 +33,21 @@ export default function WorkoutList({
       {workouts.map((workout) => {
         const category = trainingCategoryMeta[workout.category];
         return (
-          <View key={workout.id} style={styles.card}>
+          <Pressable
+            key={workout.id}
+            onPress={() =>
+              router.push({
+                pathname: '/logs/[id]',
+                params: { id: workout.id },
+              })
+            }
+            style={({ pressed }) => [
+              styles.card,
+              pressed && styles.cardPressed,
+            ]}
+            accessibilityRole="button"
+            accessibilityHint="記録を編集します"
+          >
             <View
               style={[styles.categoryBar, { backgroundColor: category.color }]}
             />
@@ -49,7 +64,7 @@ export default function WorkoutList({
               </Text>
             </View>
             <Text style={styles.tag}>{category.label}</Text>
-          </View>
+          </Pressable>
         );
       })}
       {!loading && workouts.length === 0 && (
@@ -84,6 +99,9 @@ const styles = StyleSheet.create({
     ...Shadow.card,
     shadowOpacity: 0.05,
     elevation: 1,
+  },
+  cardPressed: {
+    backgroundColor: Palette.surfaceMuted,
   },
   categoryBar: {
     width: 4,

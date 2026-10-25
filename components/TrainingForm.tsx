@@ -13,20 +13,13 @@ import CategorySegment from '@/components/CategorySegment';
 import PrimaryButton from '@/components/PrimaryButton';
 import { Palette } from '@/constants/Colors';
 import { TrainingCategory, TrainingInput } from '@/constants/training';
+import {
+  parseNumberInput,
+  parseWeightInput,
+  validateWorkoutValues,
+} from '@/helper/validation';
 
 const NAME_MAX_LENGTH = 30;
-
-/** 入力値を数値に変換する（全角数字も受け付ける）。数値でなければ NaN */
-const toNumber = (text: string) =>
-  text.trim() === ''
-    ? NaN
-    : Number(
-        text
-          .trim()
-          .replace(/[０-９．]/g, (c) =>
-            String.fromCharCode(c.charCodeAt(0) - 0xfee0),
-          ),
-      );
 
 function Field({
   label,
@@ -94,20 +87,7 @@ export default function TrainingForm({
     if (existingNames.includes(trimmed)) {
       return '同じ名前の種目がすでにあります。';
     }
-    // 重量は空欄なら 0（自重）として扱う
-    const w = weight.trim() === '' ? 0 : toNumber(weight);
-    if (!Number.isFinite(w) || w < 0 || w > 1000) {
-      return '重量は 0〜1000 kg の数値で入力してください。';
-    }
-    const r = toNumber(reps);
-    if (!Number.isInteger(r) || r < 1 || r > 1000) {
-      return '回数は 1 以上の整数で入力してください。';
-    }
-    const s = toNumber(sets);
-    if (!Number.isInteger(s) || s < 1 || s > 100) {
-      return 'セット数は 1〜100 の整数で入力してください。';
-    }
-    return null;
+    return validateWorkoutValues(weight, reps, sets);
   };
 
   const save = async () => {
@@ -122,9 +102,9 @@ export default function TrainingForm({
       await onSubmit({
         name: name.trim(),
         category,
-        defaultWeight: weight.trim() === '' ? 0 : toNumber(weight),
-        defaultReps: toNumber(reps),
-        defaultSets: toNumber(sets),
+        defaultWeight: parseWeightInput(weight),
+        defaultReps: parseNumberInput(reps),
+        defaultSets: parseNumberInput(sets),
       });
     } catch (e) {
       console.error('Failed to save training:', e);
