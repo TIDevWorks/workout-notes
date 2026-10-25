@@ -54,6 +54,7 @@ export default function RootLayout() {
           options={{
             title: 'Select Workout',
             presentation: 'modal',
+            headerShown: false,
           }}
         />
       </Stack>

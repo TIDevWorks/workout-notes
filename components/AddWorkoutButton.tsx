@@ -1,46 +1,56 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link } from 'expo-router';
 import { Pressable, StyleSheet, View, Text } from 'react-native';
+import { Palette, Shadow } from '@/constants/Colors';
 
 const AddWorkoutButton = () => {
   return (
-    <View style={styles.container}>
-      <Link href="/modals/WorkoutList" asChild>
-        <Pressable>
-          {({ pressed }) => (
-            <View style={styles.buttonContent}>
-              <Text style={styles.text}>Add Workout</Text>
-              <FontAwesome
-                name="plus-circle"
-                size={25}
-                style={{ opacity: pressed ? 0.5 : 1 }}
-                color={'#fff'}
-              />
-            </View>
-          )}
-        </Pressable>
-      </Link>
-    </View>
+    <Link href="/modals/WorkoutList" asChild>
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          pressed && styles.buttonPressed,
+        ]}
+      >
+        <View style={styles.iconCircle}>
+          <FontAwesome name="plus" size={11} color={Palette.white} />
+        </View>
+        <Text style={styles.text}>Add Workout</Text>
+      </Pressable>
+    </Link>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 2,
-    backgroundColor: '#3A9DE0',
-    borderRadius: 50,
-    marginHorizontal: '20%',
-    marginBottom: '5%',
-    elevation: 4,
-  },
-  buttonContent: {
+  button: {
+    position: 'absolute',
+    left: 24,
+    right: 24,
+    bottom: 18,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: Palette.primary,
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    ...Shadow.primaryButton,
+  },
+  buttonPressed: {
+    backgroundColor: Palette.primaryPressed,
+  },
+  iconCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.22)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   text: {
-    color: '#fff',
-    marginRight: 15,
+    color: Palette.white,
+    fontSize: 15,
+    fontWeight: '700',
   },
 });
 

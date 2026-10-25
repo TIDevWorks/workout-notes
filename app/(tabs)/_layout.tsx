@@ -1,8 +1,8 @@
-import Colors from '@/constants/Colors';
+import { Palette } from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { ColorValue, Pressable } from 'react-native';
+import { ColorValue } from 'react-native';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -10,21 +10,23 @@ function TabBarIcon(props: {
 }) {
   const { name, color } = props;
   // React Navigation は常に文字列の色を渡すため string として扱う
-  return (
-    <FontAwesome
-      size={28}
-      style={{ marginBottom: -3 }}
-      name={name}
-      color={color as string}
-    />
-  );
+  return <FontAwesome size={22} name={name} color={color as string} />;
 }
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.light.tint,
+        tabBarActiveTintColor: Palette.primary,
+        tabBarInactiveTintColor: Palette.iconInactive,
+        tabBarStyle: {
+          backgroundColor: 'rgba(255,255,255,0.94)',
+          borderTopColor: Palette.border,
+        },
+        tabBarLabelStyle: {
+          fontSize: 10,
+          fontWeight: '500',
+        },
       }}
     >
       <Tabs.Screen
@@ -49,20 +51,9 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Calendar',
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="calendar" color={color} />
-          ),
-          headerRight: () => (
-            <Pressable>
-              {({ pressed }) => (
-                <FontAwesome
-                  name="info-circle"
-                  size={25}
-                  color={Colors.light.text}
-                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                />
-              )}
-            </Pressable>
           ),
         }}
       />
