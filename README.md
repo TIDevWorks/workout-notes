@@ -8,13 +8,13 @@
 
 ## 技術スタック
 
-| 分類 | 使っているもの |
-|---|---|
-| フレームワーク | [Expo](https://expo.dev/) SDK 58 / React Native 0.88 / React 19 |
-| 画面遷移 | expo-router（ファイルベースのルーティング） |
-| バックエンド | Firebase（Authentication: 匿名 + メール/パスワード、Cloud Firestore） |
-| カレンダー | react-native-calendars |
-| 言語・品質 | TypeScript、ESLint 9 + Prettier、Jest |
+| 分類           | 使っているもの                                                        |
+| -------------- | --------------------------------------------------------------------- |
+| フレームワーク | [Expo](https://expo.dev/) SDK 58 / React Native 0.88 / React 19       |
+| 画面遷移       | expo-router（ファイルベースのルーティング）                           |
+| バックエンド   | Firebase（Authentication: 匿名 + メール/パスワード、Cloud Firestore） |
+| カレンダー     | react-native-calendars                                                |
+| 言語・品質     | TypeScript、ESLint 9 + Prettier、Jest                                 |
 
 ## セットアップ
 
@@ -64,15 +64,15 @@ npx expo start -c
 
 ## コマンド
 
-| コマンド | 内容 |
-|---|---|
-| `npm start` | 開発サーバーを起動する |
-| `npm run android` / `npm run web` | Android / Web で起動する |
-| `npm test` | テストを1回実行する |
-| `npm run test:watch` | ファイルの変更を監視してテストを実行する |
-| `npx tsc --noEmit` | 型チェック |
-| `npx eslint .` | Lint（`--fix` で自動修正） |
-| `npx expo-doctor` | Expo の設定・依存関係のチェック |
+| コマンド                          | 内容                                     |
+| --------------------------------- | ---------------------------------------- |
+| `npm start`                       | 開発サーバーを起動する                   |
+| `npm run android` / `npm run web` | Android / Web で起動する                 |
+| `npm test`                        | テストを1回実行する                      |
+| `npm run test:watch`              | ファイルの変更を監視してテストを実行する |
+| `npx tsc --noEmit`                | 型チェック                               |
+| `npx eslint .`                    | Lint（`--fix` で自動修正）               |
+| `npx expo-doctor`                 | Expo の設定・依存関係のチェック          |
 
 コードを変えたら、コミットの前に `npm test`・`npx tsc --noEmit`・`npx eslint .` が通ることを確認してください。
 
