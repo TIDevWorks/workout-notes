@@ -1,7 +1,4 @@
-const tintColorLight = '#1F78BA';
-const tintColorDark = '#fff';
-
-// デザイントークン
+// デザイントークン（アプリはライトモード固定。app.json の userInterfaceStyle も "light"）
 export const Palette = {
   bg: '#F6F7F9',
   surface: '#FFFFFF',
@@ -43,20 +40,3 @@ export const Shadow = {
     elevation: 6,
   },
 } as const;
-
-export default {
-  light: {
-    text: Palette.text,
-    background: Palette.bg,
-    tint: tintColorLight,
-    tabIconDefault: Palette.iconInactive,
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#fff',
-    background: '#000',
-    tint: tintColorDark,
-    tabIconDefault: '#ccc',
-    tabIconSelected: tintColorDark,
-  },
-};
