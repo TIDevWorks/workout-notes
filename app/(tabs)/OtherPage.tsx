@@ -61,7 +61,7 @@ function Row({ icon, label, value, href, isLast = false }: RowProps) {
   );
 }
 
-/** Other タブ。データの引き継ぎとアプリ情報への入り口 */
+/** Other タブ。種目の管理・データの引き継ぎ・アプリ情報への入り口 */
 export default function OtherPage() {
   // app.json の expo.version
   const version = Constants.expoConfig?.version ?? '-';
@@ -72,6 +72,9 @@ export default function OtherPage() {
         <Text style={styles.title}>Other</Text>
       </View>
       <ScrollView contentContainerStyle={styles.content}>
+        <Section title="種目">
+          <Row icon="list-ul" label="種目の管理" href="/trainings" isLast />
+        </Section>
         <Section title="データの引き継ぎ">
           <Row icon="key" label="引き継ぎコードを発行" href="/transfer/issue" />
           <Row

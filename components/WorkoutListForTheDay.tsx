@@ -1,10 +1,16 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Palette, Shadow } from '@/constants/Colors';
-import { WorkoutLog, trainingCategoryMeta } from '@/constants/training';
+import {
+  WorkoutLog,
+  trainingCategoryMeta,
+  workoutLogName,
+} from '@/constants/training';
 import { formatTrainingDetail } from '@/helper/format';
 
 type WorkoutListProps = {
   workouts: WorkoutLog[];
+  /** 種目 ID → 今の種目名 */
+  nameById: Map<string, string>;
   /** 読み込み中は空表示を出さない（一瞬「記録はありません」と出るのを防ぐ） */
   loading: boolean;
   error: boolean;
@@ -13,6 +19,7 @@ type WorkoutListProps = {
 /** Calendar 画面の、選択した日の記録一覧 */
 export default function WorkoutList({
   workouts,
+  nameById,
   loading,
   error,
 }: WorkoutListProps) {
@@ -30,7 +37,9 @@ export default function WorkoutList({
               style={[styles.categoryBar, { backgroundColor: category.color }]}
             />
             <View style={styles.texts}>
-              <Text style={styles.name}>{workout.trainingId}</Text>
+              <Text style={styles.name}>
+                {workoutLogName(workout, nameById)}
+              </Text>
               <Text style={styles.detail}>
                 {formatTrainingDetail(
                   workout.weight,

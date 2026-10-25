@@ -9,7 +9,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '@/firebaseConfig';
-import { Training, WorkoutLog } from '@/constants/training';
+import { Training, WorkoutLog, trainingName } from '@/constants/training';
 
 const workoutLogsRef = (userId: string) =>
   collection(db, 'users', userId, 'workoutLogs');
@@ -23,6 +23,7 @@ export const addWorkoutLog = (
   addDoc(workoutLogsRef(userId), {
     date,
     trainingId: training.id,
+    trainingName: trainingName(training),
     category: training.category,
     weight: training.defaultWeight,
     reps: training.defaultReps,

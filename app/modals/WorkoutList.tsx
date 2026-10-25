@@ -2,46 +2,23 @@
 import { useState } from 'react';
 import { Alert, StyleSheet, Pressable, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Palette } from '@/constants/Colors';
-import { useUserId } from '@/hooks/useUserId';
-import {
-  Training,
-  TrainingCategory,
-  trainingCategoryMeta,
-} from '@/constants/training';
+import CategorySegment from '@/components/CategorySegment';
 import TrainingList from '@/components/TrainingList';
+import { Palette } from '@/constants/Colors';
+import { Training, TrainingCategory } from '@/constants/training';
 import { toDateString } from '@/helper/format';
 import { addWorkoutLog } from '@/helper/workoutLog';
+import { useTrainings } from '@/hooks/useTrainings';
+import { useUserId } from '@/hooks/useUserId';
 
 // Select Workout モーダル。カテゴリを切り替えて種目を選び、+ で記録を追加する。
 // Add Workout ボタンから、記録する日付を URL パラメータ（date）で受け取る。
 
-/** セグメントの並び順 */
-const TABS: TrainingCategory[] = ['bodyweight', 'machine', 'freeWeights'];
-
-/** カテゴリ切り替えのセグメントボタン */
-type TabProps = {
-  label: string;
-  isActive: boolean;
-  onPress: () => void;
-};
-
-function TabButton({ label, isActive, onPress }: TabProps) {
-  return (
-    <Pressable
-      style={[styles.segment, isActive && styles.activeSegment]}
-      onPress={onPress}
-    >
-      <Text style={[styles.segmentText, isActive && styles.activeSegmentText]}>
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
-
 export default function WorkoutList() {
   const [activeTab, setActiveTab] = useState<TrainingCategory>('freeWeights');
   const userId = useUserId();
+  // 全種目を購読し、選択中のカテゴリだけを表示する（Other で追加した種目もすぐ反映される）
+  const { trainings, loading } = useTrainings(userId);
   const params = useLocalSearchParams<{ date?: string }>();
   // パラメータがない場合（直接開かれた場合など）は今日に記録する
   const date = params.date ?? toDateString(new Date());
@@ -72,19 +49,16 @@ export default function WorkoutList() {
           )}
         </Pressable>
       </View>
-      <View style={styles.segmentContainer}>
-        {TABS.map((tab) => (
-          <TabButton
-            key={tab}
-            label={trainingCategoryMeta[tab].label}
-            isActive={activeTab === tab}
-            onPress={() => setActiveTab(tab)}
-          />
-        ))}
-      </View>
-      {userId && (
-        <TrainingList category={activeTab} userId={userId} onAdd={handleAdd} />
-      )}
+      <CategorySegment
+        value={activeTab}
+        onChange={setActiveTab}
+        style={styles.segment}
+      />
+      <TrainingList
+        trainings={trainings.filter((t) => t.category === activeTab)}
+        loading={loading}
+        onAdd={handleAdd}
+      />
     </View>
   );
 }
@@ -125,36 +99,7 @@ const styles = StyleSheet.create({
   closePressed: {
     color: Palette.primaryPressed,
   },
-  segmentContainer: {
-    flexDirection: 'row',
-    gap: 3,
-    marginHorizontal: 20,
-    padding: 3,
-    borderRadius: 10,
-    backgroundColor: Palette.surfaceMuted,
-  },
   segment: {
-    flex: 1,
-    height: 34,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  activeSegment: {
-    backgroundColor: Palette.surface,
-    shadowColor: Palette.text,
-    shadowOpacity: 0.12,
-    shadowRadius: 3,
-    shadowOffset: { width: 0, height: 1 },
-    elevation: 1,
-  },
-  segmentText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: Palette.textMuted,
-  },
-  activeSegmentText: {
-    fontWeight: '700',
-    color: Palette.text,
+    marginHorizontal: 20,
   },
 });

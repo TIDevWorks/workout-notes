@@ -1,53 +1,37 @@
 // components/TrainingList.tsx
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Pressable, ScrollView, View, Text, StyleSheet } from 'react-native';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '@/firebaseConfig';
-import { useEffect, useState } from 'react';
 import { Palette } from '@/constants/Colors';
-import { Training, TrainingCategory } from '@/constants/training';
+import { Training, trainingName } from '@/constants/training';
 import { formatTrainingDetail } from '@/helper/format';
 
 interface TrainingListProps {
-  category: TrainingCategory;
-  userId: string;
+  /** 表示する種目（並び順に整列済み） */
+  trainings: Training[];
+  /** 読み込み中は空表示を出さない */
+  loading: boolean;
   /** 種目の + を押したとき */
   onAdd: (training: Training) => void;
 }
 
-/** 指定カテゴリの種目一覧（users/{uid}/trainingList）を表示する */
+/** Select Workout モーダルの種目一覧 */
 export default function TrainingList({
-  category,
-  userId,
+  trainings,
+  loading,
   onAdd,
 }: TrainingListProps) {
-  const [trainings, setTrainings] = useState<Training[]>([]);
-
-  // カテゴリを切り替えるたびに、そのカテゴリの種目だけを取得し直す
-  useEffect(() => {
-    const fetchTrainings = async () => {
-      const trainingListRef = collection(db, 'users', userId, 'trainingList');
-      const q = query(trainingListRef, where('category', '==', category));
-      const querySnapshot = await getDocs(q);
-
-      const trainingData: Training[] = [];
-      // ドキュメント ID（benchPress など）を種目の id として使う
-      querySnapshot.forEach((doc) => {
-        trainingData.push({ id: doc.id, ...doc.data() } as Training);
-      });
-
-      setTrainings(trainingData);
-    };
-
-    fetchTrainings();
-  }, [category, userId]);
-
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
+      {!loading && trainings.length === 0 && (
+        <Text style={styles.empty}>
+          このカテゴリの種目はありません。Other
+          の「種目を追加」から追加できます。
+        </Text>
+      )}
       {trainings.map((training) => (
         <View key={training.id} style={styles.trainingItem}>
           <View style={styles.texts}>
-            <Text style={styles.trainingName}>{training.id}</Text>
+            <Text style={styles.trainingName}>{trainingName(training)}</Text>
             <Text style={styles.trainingDetails}>
               {formatTrainingDetail(
                 training.defaultWeight,
@@ -63,6 +47,8 @@ export default function TrainingList({
             ]}
             onPress={() => onAdd(training)}
             hitSlop={6}
+            accessibilityRole="button"
+            accessibilityLabel={`${trainingName(training)}を記録`}
           >
             <FontAwesome name="plus" size={14} color={Palette.primary} />
           </Pressable>
@@ -113,5 +99,12 @@ const styles = StyleSheet.create({
   },
   addCirclePressed: {
     opacity: 0.6,
+  },
+  empty: {
+    fontSize: 13,
+    lineHeight: 20,
+    color: Palette.textMuted,
+    textAlign: 'center',
+    paddingVertical: 24,
   },
 });

@@ -70,6 +70,18 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="trainings/index"
+          options={{ title: '種目の管理', headerBackTitle: '戻る' }}
+        />
+        <Stack.Screen
+          name="trainings/new"
+          options={{ title: '種目の追加', headerBackTitle: '戻る' }}
+        />
+        <Stack.Screen
+          name="trainings/[id]"
+          options={{ title: '種目の編集', headerBackTitle: '戻る' }}
+        />
+        <Stack.Screen
           name="transfer/issue"
           options={{ title: '引き継ぎコードの発行', headerBackTitle: '戻る' }}
         />

@@ -7,6 +7,7 @@ import Calendar from '@/components/Calendar';
 import WorkoutList from '@/components/WorkoutListForTheDay';
 import { Palette } from '@/constants/Colors';
 import { formatDayLabel, monthRange, toDateString } from '@/helper/format';
+import { useTrainings } from '@/hooks/useTrainings';
 import { useUserId } from '@/hooks/useUserId';
 import { useWorkoutLogs } from '@/hooks/useWorkoutLogs';
 
@@ -30,6 +31,8 @@ export default function Index() {
   const monthLogs = useWorkoutLogs(userId, start, end);
   const dayLogs = useWorkoutLogs(userId, selectedDate, selectedDate);
   const workouts = dayLogs.logs;
+  // 記録の種目名を、種目の今の名前で表示するために使う
+  const { nameById } = useTrainings(userId);
   // 記録がある日付（重複なし）。カレンダーのドット表示に使う
   const markedDateStrings = useMemo(
     () => [...new Set(monthLogs.logs.map((log) => log.date))],
@@ -62,6 +65,7 @@ export default function Index() {
       </View>
       <WorkoutList
         workouts={workouts}
+        nameById={nameById}
         loading={dayLogs.loading}
         error={dayLogs.error}
       />

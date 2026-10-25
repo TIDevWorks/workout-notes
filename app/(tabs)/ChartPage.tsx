@@ -13,7 +13,7 @@ import ChartCard from '@/components/ChartCard';
 import ColumnChart, { ColumnDatum } from '@/components/ColumnChart';
 import StatTile from '@/components/StatTile';
 import { Palette } from '@/constants/Colors';
-import { WorkoutLog } from '@/constants/training';
+import { WorkoutLog, workoutLogName } from '@/constants/training';
 import {
   addDays,
   formatShortDate,
@@ -22,6 +22,7 @@ import {
   startOfWeek,
   toDateString,
 } from '@/helper/format';
+import { useTrainings } from '@/hooks/useTrainings';
 import { useUserId } from '@/hooks/useUserId';
 import { useWorkoutLogs } from '@/hooks/useWorkoutLogs';
 
@@ -64,6 +65,8 @@ export default function ChartPage() {
   }, [today]);
 
   const { logs, loading } = useWorkoutLogs(userId, periods.rangeStart, today);
+  // 種目別グラフのラベルを、種目の今の名前で表示するために使う
+  const { nameById } = useTrainings(userId);
 
   // 今月の要約（先月との差つき）
   const stats = useMemo(() => {
@@ -97,22 +100,24 @@ export default function ChartPage() {
 
   // 種目ごとの記録回数（多い順）。上位 MAX_TRAININGS - 1 件以外は「その他」にまとめる
   const byTraining = useMemo<BarDatum[]>(() => {
-    const counts = new Map<string, number>();
+    // 種目 ID ごとに集計する（ラベルは種目の今の名前）
+    const counts = new Map<string, BarDatum>();
     logs
       .filter((l) => inRange(l, periods.firstWeekStart, today))
       .forEach((l) =>
-        counts.set(l.trainingId, (counts.get(l.trainingId) ?? 0) + 1),
+        counts.set(l.trainingId, {
+          label: workoutLogName(l, nameById),
+          value: (counts.get(l.trainingId)?.value ?? 0) + 1,
+        }),
       );
-    const sorted = [...counts.entries()]
-      .map(([label, value]) => ({ label, value }))
-      .sort((a, b) => b.value - a.value);
+    const sorted = [...counts.values()].sort((a, b) => b.value - a.value);
     if (sorted.length <= MAX_TRAININGS) return sorted;
     const rest = sorted.slice(MAX_TRAININGS - 1);
     return [
       ...sorted.slice(0, MAX_TRAININGS - 1),
       { label: 'その他', value: rest.reduce((sum, d) => sum + d.value, 0) },
     ];
-  }, [logs, periods, today]);
+  }, [logs, periods, today, nameById]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>

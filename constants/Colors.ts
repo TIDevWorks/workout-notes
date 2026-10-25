@@ -17,6 +17,8 @@ export const Palette = {
   primarySoft: '#E8F2FA',
   dot: '#3A9DE0',
   sunday: '#C2473A',
+  /** 削除など取り消せない操作 */
+  danger: '#C2473A',
   saturday: '#2F6FB0',
   border: '#E6E8EB',
   divider: '#EEF0F2',
