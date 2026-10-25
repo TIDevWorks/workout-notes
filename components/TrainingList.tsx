@@ -25,7 +25,7 @@ export default function TrainingList({
       {!loading && trainings.length === 0 && (
         <Text style={styles.empty}>
           このカテゴリの種目はありません。Other
-          の「種目を追加」から追加できます。
+          の「種目の管理」から追加できます。
         </Text>
       )}
       {trainings.map((training) => (

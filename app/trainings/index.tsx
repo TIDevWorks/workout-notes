@@ -22,7 +22,8 @@ export default function TrainingManagement() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <PrimaryButton
-        label="種目を追加"
+        label="Add Exercise"
+        icon="plus"
         onPress={() => router.push('/trainings/new')}
       />
 
