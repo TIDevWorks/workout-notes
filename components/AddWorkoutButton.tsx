@@ -1,5 +1,5 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link } from 'expo-router';
+import { router } from 'expo-router';
 import { Pressable, StyleSheet, View, Text } from 'react-native';
 import { Palette, Shadow } from '@/constants/Colors';
 
@@ -13,20 +13,22 @@ type AddWorkoutButtonProps = {
  * Select Workout モーダルを開き、記録する日付を URL パラメータで渡す。
  */
 const AddWorkoutButton = ({ date }: AddWorkoutButtonProps) => {
+  // <Link asChild> は子の style をオブジェクトとして合成するため、関数の style
+  // （押下状態で色を変える）が消えてボタンが表示されなくなる。そのため router.push で遷移する
   return (
-    <Link href={{ pathname: '/modals/WorkoutList', params: { date } }} asChild>
-      <Pressable
-        style={({ pressed }) => [
-          styles.button,
-          pressed && styles.buttonPressed,
-        ]}
-      >
-        <View style={styles.iconCircle}>
-          <FontAwesome name="plus" size={11} color={Palette.white} />
-        </View>
-        <Text style={styles.text}>Add Workout</Text>
-      </Pressable>
-    </Link>
+    <Pressable
+      onPress={() =>
+        router.push({ pathname: '/modals/WorkoutList', params: { date } })
+      }
+      style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+      accessibilityRole="button"
+      accessibilityLabel="Add Workout"
+    >
+      <View style={styles.iconCircle}>
+        <FontAwesome name="plus" size={11} color={Palette.white} />
+      </View>
+      <Text style={styles.text}>Add Workout</Text>
+    </Pressable>
   );
 };
 
