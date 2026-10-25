@@ -16,7 +16,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#1F78BA"
       },
       "package": "com.tidevworks.workoutnotes"
     },
@@ -32,8 +32,9 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/splash.png",
+          "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#1F78BA"
         }
       ],
       "expo-secure-store"
