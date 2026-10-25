@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "workout-notes",
+    "name": "Workout Notes",
     "slug": "workout-notes",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "com.tidevworks.workoutnotes",
     "userInterfaceStyle": "light",
     "assetBundlePatterns": [
       "**/*"

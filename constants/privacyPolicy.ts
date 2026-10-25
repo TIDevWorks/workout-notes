@@ -1,5 +1,5 @@
 // constants/privacyPolicy.ts
-// TODO: ストア公開前に内容（特に運営者名・お問い合わせ先）を確認・確定すること
+// 内容を変えたら PRIVACY_POLICY_UPDATED_AT も更新すること
 export const PRIVACY_POLICY_UPDATED_AT = '2026年10月25日';
 
 export const privacyPolicySections: { title: string; body: string }[] = [
@@ -33,14 +33,10 @@ export const privacyPolicySections: { title: string; body: string }[] = [
   },
   {
     title: 'データの削除',
-    body: 'データの削除をご希望の場合は、下記のお問い合わせ先までご連絡ください。',
+    body: 'トレーニングの記録は、アプリ内からいつでも削除できます。アカウントを含むすべてのデータの削除をご希望の場合は、Google Play の本アプリの掲載ページに記載されている開発者の連絡先までご連絡ください。',
   },
   {
     title: '改定',
     body: '本ポリシーの内容は、必要に応じて改定することがあります。改定後の内容は本アプリ内に掲載した時点で効力を生じます。',
-  },
-  {
-    title: 'お問い合わせ',
-    body: '【お問い合わせ先を記載してください】',
   },
 ];
