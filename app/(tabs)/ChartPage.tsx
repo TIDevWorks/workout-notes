@@ -8,48 +8,53 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import BarChart, { BarDatum } from '@/components/BarChart';
 import ChartCard from '@/components/ChartCard';
-import ColumnChart, { ColumnDatum } from '@/components/ColumnChart';
+import LineChart from '@/components/LineChart';
+import SegmentedControl from '@/components/SegmentedControl';
 import StatTile from '@/components/StatTile';
 import { Palette } from '@/constants/Colors';
-import { WorkoutLog, workoutLogName } from '@/constants/training';
+import { WorkoutLog } from '@/constants/training';
 import {
-  addDays,
   formatShortDate,
   monthRange,
   parseDateString,
-  startOfWeek,
   toDateString,
 } from '@/helper/format';
+import {
+  Metric,
+  buildSeries,
+  metricLabels,
+  weightedTrainingIds,
+} from '@/helper/stats';
 import { useTrainings } from '@/hooks/useTrainings';
 import { useUserId } from '@/hooks/useUserId';
 import { useWorkoutLogs } from '@/hooks/useWorkoutLogs';
 
-/** 週ごと・種目別グラフの対象期間（週数） */
-const WEEKS = 8;
-/** 種目別グラフに個別で表示する最大数（残りは「その他」にまとめる） */
-const MAX_TRAININGS = 7;
+/** グラフの対象期間（月数） */
+const RANGE_MONTHS = 6;
+
+const metricOptions = (['maxWeight', 'oneRm'] as Metric[]).map((value) => ({
+  value,
+  label: metricLabels[value],
+}));
 
 /** トレーニングした日数（同じ日に複数記録があっても1日と数える） */
 const countDays = (logs: WorkoutLog[]) =>
   new Set(logs.map((log) => log.date)).size;
 
-/** 記録が start〜end（YYYY-MM-DD、両端を含む）に入っているか */
-const inRange = (log: WorkoutLog, start: string, end: string) =>
-  log.date >= start && log.date <= end;
-
 /**
- * Chart タブ。記録を集計して、今月の要約・週ごとの日数・種目別の回数を表示する。
- * 必要な期間の記録を1回の購読でまとめて取得し、画面側で期間ごとに振り分けて集計する。
+ * Chart タブ。選んだ種目の Max重量 または 推定1RM の推移を折れ線グラフで表示する。
+ * 直近 RANGE_MONTHS ヶ月の記録を1回の購読でまとめて取得し、画面側で集計する。
  */
 export default function ChartPage() {
   const userId = useUserId();
   const today = useMemo(() => toDateString(new Date()), []);
-  // 週ごとのグラフを表で表示するか
+  const [metric, setMetric] = useState<Metric>('maxWeight');
+  // 未選択（null）の間は、記録の多い種目を表示する
+  const [pickedId, setPickedId] = useState<string | null>(null);
   const [showTable, setShowTable] = useState(false);
 
-  // 集計に使う期間。rangeStart は取得範囲の開始日（8週前の日曜と先月1日の早いほう）
+  // 取得範囲（直近 RANGE_MONTHS ヶ月の1日から今日まで）と、今月・先月の範囲
   const periods = useMemo(() => {
     const now = parseDateString(today);
     const thisMonth = monthRange(now.getFullYear(), now.getMonth() + 1);
@@ -58,66 +63,42 @@ export default function ChartPage() {
       lastMonthDate.getFullYear(),
       lastMonthDate.getMonth() + 1,
     );
-    const firstWeekStart = addDays(startOfWeek(today), -7 * (WEEKS - 1));
-    const rangeStart =
-      firstWeekStart < lastMonth.start ? firstWeekStart : lastMonth.start;
-    return { thisMonth, lastMonth, firstWeekStart, rangeStart };
+    const start = new Date(
+      now.getFullYear(),
+      now.getMonth() - (RANGE_MONTHS - 1),
+      1,
+    );
+    return { thisMonth, lastMonth, rangeStart: toDateString(start) };
   }, [today]);
 
   const { logs, loading } = useWorkoutLogs(userId, periods.rangeStart, today);
-  // 種目別グラフのラベルを、種目の今の名前で表示するために使う
   const { nameById } = useTrainings(userId);
 
-  // 今月の要約（先月との差つき）
-  const stats = useMemo(() => {
-    const { thisMonth, lastMonth } = periods;
-    const thisLogs = logs.filter((l) => inRange(l, thisMonth.start, today));
-    const lastLogs = logs.filter((l) =>
-      inRange(l, lastMonth.start, lastMonth.end),
+  // 今月のトレーニング日数（先月との差つき）
+  const days = useMemo(() => {
+    const inMonth = (start: string, end: string) =>
+      logs.filter((l) => l.date >= start && l.date <= end);
+    const thisDays = countDays(inMonth(periods.thisMonth.start, today));
+    const lastDays = countDays(
+      inMonth(periods.lastMonth.start, periods.lastMonth.end),
     );
-    return {
-      days: countDays(thisLogs),
-      daysDelta: countDays(thisLogs) - countDays(lastLogs),
-      records: thisLogs.length,
-      recordsDelta: thisLogs.length - lastLogs.length,
-    };
+    return { value: thisDays, delta: thisDays - lastDays };
   }, [logs, periods, today]);
 
-  // 週（日曜〜土曜）ごとのトレーニング日数。古い週から順に並べる
-  const weekly = useMemo<ColumnDatum[]>(
-    () =>
-      Array.from({ length: WEEKS }, (_, i) => {
-        const start = addDays(periods.firstWeekStart, 7 * i);
-        const end = addDays(start, 6);
-        return {
-          label: formatShortDate(start),
-          longLabel: `${formatShortDate(start)}〜${formatShortDate(end)}`,
-          value: countDays(logs.filter((l) => inRange(l, start, end))),
-        };
-      }),
-    [logs, periods],
-  );
+  // グラフで選べる種目（重量を記録した種目、記録の多い順）
+  const trainingIds = useMemo(() => weightedTrainingIds(logs), [logs]);
+  const trainingId =
+    pickedId && trainingIds.includes(pickedId) ? pickedId : trainingIds[0];
+  const trainingLabel = (id: string) => nameById.get(id) ?? id;
 
-  // 種目ごとの記録回数（多い順）。上位 MAX_TRAININGS - 1 件以外は「その他」にまとめる
-  const byTraining = useMemo<BarDatum[]>(() => {
-    // 種目 ID ごとに集計する（ラベルは種目の今の名前）
-    const counts = new Map<string, BarDatum>();
-    logs
-      .filter((l) => inRange(l, periods.firstWeekStart, today))
-      .forEach((l) =>
-        counts.set(l.trainingId, {
-          label: workoutLogName(l, nameById),
-          value: (counts.get(l.trainingId)?.value ?? 0) + 1,
-        }),
-      );
-    const sorted = [...counts.values()].sort((a, b) => b.value - a.value);
-    if (sorted.length <= MAX_TRAININGS) return sorted;
-    const rest = sorted.slice(MAX_TRAININGS - 1);
-    return [
-      ...sorted.slice(0, MAX_TRAININGS - 1),
-      { label: 'その他', value: rest.reduce((sum, d) => sum + d.value, 0) },
-    ];
-  }, [logs, periods, today, nameById]);
+  const series = useMemo(
+    () => (trainingId ? buildSeries(logs, trainingId, metric) : []),
+    [logs, trainingId, metric],
+  );
+  const best = series.reduce<(typeof series)[number] | null>(
+    (acc, p) => (!acc || p.value > acc.value ? p : acc),
+    null,
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -128,48 +109,104 @@ export default function ChartPage() {
         <ActivityIndicator style={styles.loading} color={Palette.textMuted} />
       ) : (
         <ScrollView contentContainerStyle={styles.content}>
+          {/* 表示の切り替え（下のカードとグラフの両方に反映される） */}
+          {trainingId && (
+            <View style={styles.filters}>
+              <SegmentedControl
+                options={metricOptions}
+                value={metric}
+                onChange={setMetric}
+              />
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.chips}
+              >
+                {trainingIds.map((id) => {
+                  const isActive = id === trainingId;
+                  return (
+                    <Pressable
+                      key={id}
+                      onPress={() => setPickedId(id)}
+                      style={[styles.chip, isActive && styles.chipActive]}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: isActive }}
+                    >
+                      <Text
+                        style={[
+                          styles.chipText,
+                          isActive && styles.chipTextActive,
+                        ]}
+                      >
+                        {trainingLabel(id)}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
+
           <View style={styles.tiles}>
             <StatTile
               label="今月のトレーニング日数"
-              value={stats.days}
+              value={days.value}
               unit="日"
-              delta={{ value: stats.daysDelta, period: '先月比' }}
+              delta={{ value: days.delta, period: '先月比' }}
             />
             <StatTile
-              label="今月の記録"
-              value={stats.records}
-              unit="種目"
-              delta={{ value: stats.recordsDelta, period: '先月比' }}
+              label={
+                trainingId
+                  ? `${trainingLabel(trainingId)}の${metricLabels[metric]}`
+                  : metricLabels[metric]
+              }
+              value={best?.value ?? null}
+              unit="kg"
+              caption={
+                best
+                  ? `${formatShortDate(best.date)}・直近${RANGE_MONTHS}ヶ月の最高`
+                  : '記録なし'
+              }
             />
           </View>
 
-          <ChartCard
-            title="週ごとのトレーニング日数"
-            subtitle={`直近${WEEKS}週間・日曜始まり・棒をタップで値を表示`}
-            accessory={
-              <Pressable onPress={() => setShowTable((v) => !v)} hitSlop={8}>
-                {({ pressed }) => (
-                  <Text
-                    style={[styles.toggle, pressed && styles.togglePressed]}
-                  >
-                    {showTable ? 'グラフで見る' : '表で見る'}
-                  </Text>
-                )}
-              </Pressable>
-            }
-          >
-            <ColumnChart data={weekly} unit="日" showTable={showTable} />
-          </ChartCard>
-
-          <ChartCard title="種目別の記録回数" subtitle={`直近${WEEKS}週間`}>
-            {byTraining.length > 0 ? (
-              <BarChart data={byTraining} unit="回" />
-            ) : (
-              <Text style={styles.empty}>
-                {`直近${WEEKS}週間の記録はありません`}
+          {trainingId ? (
+            <ChartCard
+              title={`${trainingLabel(trainingId)}の${metricLabels[metric]}`}
+              subtitle={`直近${RANGE_MONTHS}ヶ月・グラフをタップで値を表示`}
+              accessory={
+                <Pressable onPress={() => setShowTable((v) => !v)} hitSlop={8}>
+                  {({ pressed }) => (
+                    <Text
+                      style={[styles.toggle, pressed && styles.togglePressed]}
+                    >
+                      {showTable ? 'グラフで見る' : '表で見る'}
+                    </Text>
+                  )}
+                </Pressable>
+              }
+            >
+              <LineChart
+                // 種目・指標を変えたら、選択中の点を最新に戻す
+                key={`${trainingId}-${metric}`}
+                data={series}
+                unit="kg"
+                showTable={showTable}
+              />
+              {metric === 'oneRm' && (
+                <Text style={styles.note}>
+                  推定1RM = 重量 × (1 + 回数 ÷
+                  30)（Epley式）。各セットから計算した、その日の最大値です。回数が多いセットほど誤差が大きくなります。
+                </Text>
+              )}
+            </ChartCard>
+          ) : (
+            <View style={styles.empty}>
+              <Text style={styles.emptyText}>
+                {`直近${RANGE_MONTHS}ヶ月に重量を記録した種目がありません。\n記録するとここに推移が表示されます。`}
               </Text>
-            )}
-          </ChartCard>
+            </View>
+          )}
         </ScrollView>
       )}
     </SafeAreaView>
@@ -200,6 +237,34 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
     gap: 12,
   },
+  filters: {
+    gap: 10,
+  },
+  chips: {
+    gap: 8,
+  },
+  chip: {
+    height: 32,
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    justifyContent: 'center',
+    backgroundColor: Palette.surface,
+    borderWidth: 1,
+    borderColor: Palette.border,
+  },
+  chipActive: {
+    backgroundColor: Palette.primary,
+    borderColor: Palette.primary,
+  },
+  chipText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: Palette.text,
+  },
+  chipTextActive: {
+    fontWeight: '700',
+    color: Palette.white,
+  },
   tiles: {
     flexDirection: 'row',
     gap: 12,
@@ -212,10 +277,24 @@ const styles = StyleSheet.create({
   togglePressed: {
     color: Palette.primaryPressed,
   },
+  note: {
+    fontSize: 11,
+    lineHeight: 16,
+    color: Palette.textMuted,
+  },
   empty: {
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: Palette.dashed,
+    borderRadius: 14,
+    paddingVertical: 28,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+  },
+  emptyText: {
     fontSize: 13,
+    lineHeight: 20,
     color: Palette.textMuted,
     textAlign: 'center',
-    paddingVertical: 12,
   },
 });
