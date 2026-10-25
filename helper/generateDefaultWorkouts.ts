@@ -3,6 +3,9 @@ import { collection, doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { Training, TrainingCategory } from '@/constants/training';
 
+// 初回起動時に users/{uid}/trainingList へ登録するデフォルトの種目。
+// キーがドキュメント ID（= 種目の id）になる。
+
 interface TrainingData extends Omit<Training, 'id'> {
   defaultWeight: number;
   defaultReps: number;
@@ -78,9 +81,13 @@ const defaultTrainings: Record<string, TrainingData> = {
   },
 };
 
-export const generateDefaultWorkouts = async (uuid: string) => {
+/**
+ * デフォルトの種目を登録する。同じ ID で上書きするため、何度実行しても重複しない
+ * （初期化に失敗して再実行された場合も安全）。
+ */
+export const generateDefaultWorkouts = async (userId: string) => {
   try {
-    const userRef = doc(db, 'users', uuid);
+    const userRef = doc(db, 'users', userId);
     const trainingListRef = collection(userRef, 'trainingList');
 
     // 各トレーニング種目をFirestoreに追加

@@ -11,9 +11,11 @@ import { formatTrainingDetail } from '@/helper/format';
 interface TrainingListProps {
   category: TrainingCategory;
   userId: string;
+  /** 種目の + を押したとき */
   onAdd: (training: Training) => void;
 }
 
+/** 指定カテゴリの種目一覧（users/{uid}/trainingList）を表示する */
 export default function TrainingList({
   category,
   userId,
@@ -21,6 +23,7 @@ export default function TrainingList({
 }: TrainingListProps) {
   const [trainings, setTrainings] = useState<Training[]>([]);
 
+  // カテゴリを切り替えるたびに、そのカテゴリの種目だけを取得し直す
   useEffect(() => {
     const fetchTrainings = async () => {
       const trainingListRef = collection(db, 'users', userId, 'trainingList');
@@ -28,6 +31,7 @@ export default function TrainingList({
       const querySnapshot = await getDocs(q);
 
       const trainingData: Training[] = [];
+      // ドキュメント ID（benchPress など）を種目の id として使う
       querySnapshot.forEach((doc) => {
         trainingData.push({ id: doc.id, ...doc.data() } as Training);
       });

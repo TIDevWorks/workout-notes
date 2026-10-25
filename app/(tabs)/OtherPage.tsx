@@ -6,6 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Palette, Shadow } from '@/constants/Colors';
 
+/** 見出し付きのグループ（中の行をカードにまとめる） */
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <View style={styles.section}>
@@ -20,10 +21,13 @@ type RowProps = {
   label: string;
   /** 右側に表示する値（指定時は遷移しない行になる） */
   value?: string;
+  /** 押したときの遷移先 */
   href?: Href;
+  /** グループの最後の行（下の区切り線を出さない） */
   isLast?: boolean;
 };
 
+/** グループ内の1行。href があれば押せる行、value があれば値を表示する行になる */
 function Row({ icon, label, value, href, isLast = false }: RowProps) {
   const content = (pressed: boolean) => (
     <View
@@ -57,7 +61,9 @@ function Row({ icon, label, value, href, isLast = false }: RowProps) {
   );
 }
 
+/** Other タブ。データの引き継ぎとアプリ情報への入り口 */
 export default function OtherPage() {
+  // app.json の expo.version
   const version = Constants.expoConfig?.version ?? '-';
 
   return (

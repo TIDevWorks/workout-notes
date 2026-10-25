@@ -8,6 +8,10 @@ type AddWorkoutButtonProps = {
   date: string;
 };
 
+/**
+ * Calendar 画面の下に浮かぶ Add Workout ボタン。
+ * Select Workout モーダルを開き、記録する日付を URL パラメータで渡す。
+ */
 const AddWorkoutButton = ({ date }: AddWorkoutButtonProps) => {
   return (
     <Link href={{ pathname: '/modals/WorkoutList', params: { date } }} asChild>

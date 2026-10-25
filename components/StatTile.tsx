@@ -11,6 +11,7 @@ type StatTileProps = {
 
 const formatDelta = (n: number) => (n > 0 ? `+${n}` : `${n}`);
 
+/** 1つの数値を大きく見せるカード（ラベル・値・前期間との差） */
 export default function StatTile({ label, value, unit, delta }: StatTileProps) {
   return (
     <View style={styles.tile}>

@@ -12,8 +12,10 @@ type BarChartProps = {
   unit: string;
 };
 
+/** 棒の太さ（ガイドラインの上限 24px 以下） */
 const BAR_HEIGHT = 14;
 
+/** 横棒グラフ（1系列）。各棒の先に値を表示する */
 export default function BarChart({ data, unit }: BarChartProps) {
   const maxValue = Math.max(...data.map((d) => d.value), 1);
 

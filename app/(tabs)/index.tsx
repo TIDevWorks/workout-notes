@@ -10,10 +10,16 @@ import { formatDayLabel, monthRange, toDateString } from '@/helper/format';
 import { useUserId } from '@/hooks/useUserId';
 import { useWorkoutLogs } from '@/hooks/useWorkoutLogs';
 
+/**
+ * Calendar タブ。カレンダーで日付を選び、その日の記録を一覧表示する。
+ * Add Workout から選択中の日付に記録を追加できる。
+ */
 export default function Index() {
   const userId = useUserId();
+  // 「今日」は画面を開いた時点の日付で固定する
   const today = useMemo(() => toDateString(new Date()), []);
   const [selectedDate, setSelectedDate] = useState(today);
+  // カレンダーで表示中の月（month は 1〜12）。ドットを付ける記録の取得範囲に使う
   const [visibleMonth, setVisibleMonth] = useState(() => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() + 1 };
@@ -24,6 +30,7 @@ export default function Index() {
   const monthLogs = useWorkoutLogs(userId, start, end);
   const dayLogs = useWorkoutLogs(userId, selectedDate, selectedDate);
   const workouts = dayLogs.logs;
+  // 記録がある日付（重複なし）。カレンダーのドット表示に使う
   const markedDateStrings = useMemo(
     () => [...new Set(monthLogs.logs.map((log) => log.date))],
     [monthLogs.logs],
@@ -33,6 +40,7 @@ export default function Index() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.title}>Calendar</Text>
+        {/* TODO: 押したときの動作は未定 */}
         <Pressable style={styles.infoButton}>
           <FontAwesome name="info-circle" size={16} color={Palette.textMuted} />
         </Pressable>

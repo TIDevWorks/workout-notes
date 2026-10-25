@@ -13,8 +13,13 @@ import TrainingList from '@/components/TrainingList';
 import { toDateString } from '@/helper/format';
 import { addWorkoutLog } from '@/helper/workoutLog';
 
+// Select Workout モーダル。カテゴリを切り替えて種目を選び、+ で記録を追加する。
+// Add Workout ボタンから、記録する日付を URL パラメータ（date）で受け取る。
+
+/** セグメントの並び順 */
 const TABS: TrainingCategory[] = ['bodyweight', 'machine', 'freeWeights'];
 
+/** カテゴリ切り替えのセグメントボタン */
 type TabProps = {
   label: string;
   isActive: boolean;
@@ -38,8 +43,10 @@ export default function WorkoutList() {
   const [activeTab, setActiveTab] = useState<TrainingCategory>('freeWeights');
   const userId = useUserId();
   const params = useLocalSearchParams<{ date?: string }>();
+  // パラメータがない場合（直接開かれた場合など）は今日に記録する
   const date = params.date ?? toDateString(new Date());
 
+  /** 種目の + を押したとき: 種目のデフォルト値で記録を追加して閉じる */
   const handleAdd = (training: Training) => {
     if (!userId) return;
     // 画面には書き込み完了を待たずに反映されるため、先に閉じる

@@ -25,21 +25,30 @@ import {
 import { useUserId } from '@/hooks/useUserId';
 import { useWorkoutLogs } from '@/hooks/useWorkoutLogs';
 
+/** 週ごと・種目別グラフの対象期間（週数） */
 const WEEKS = 8;
 /** 種目別グラフに個別で表示する最大数（残りは「その他」にまとめる） */
 const MAX_TRAININGS = 7;
 
+/** トレーニングした日数（同じ日に複数記録があっても1日と数える） */
 const countDays = (logs: WorkoutLog[]) =>
   new Set(logs.map((log) => log.date)).size;
 
+/** 記録が start〜end（YYYY-MM-DD、両端を含む）に入っているか */
 const inRange = (log: WorkoutLog, start: string, end: string) =>
   log.date >= start && log.date <= end;
 
+/**
+ * Chart タブ。記録を集計して、今月の要約・週ごとの日数・種目別の回数を表示する。
+ * 必要な期間の記録を1回の購読でまとめて取得し、画面側で期間ごとに振り分けて集計する。
+ */
 export default function ChartPage() {
   const userId = useUserId();
   const today = useMemo(() => toDateString(new Date()), []);
+  // 週ごとのグラフを表で表示するか
   const [showTable, setShowTable] = useState(false);
 
+  // 集計に使う期間。rangeStart は取得範囲の開始日（8週前の日曜と先月1日の早いほう）
   const periods = useMemo(() => {
     const now = parseDateString(today);
     const thisMonth = monthRange(now.getFullYear(), now.getMonth() + 1);
@@ -56,6 +65,7 @@ export default function ChartPage() {
 
   const { logs, loading } = useWorkoutLogs(userId, periods.rangeStart, today);
 
+  // 今月の要約（先月との差つき）
   const stats = useMemo(() => {
     const { thisMonth, lastMonth } = periods;
     const thisLogs = logs.filter((l) => inRange(l, thisMonth.start, today));
@@ -70,6 +80,7 @@ export default function ChartPage() {
     };
   }, [logs, periods, today]);
 
+  // 週（日曜〜土曜）ごとのトレーニング日数。古い週から順に並べる
   const weekly = useMemo<ColumnDatum[]>(
     () =>
       Array.from({ length: WEEKS }, (_, i) => {
@@ -84,6 +95,7 @@ export default function ChartPage() {
     [logs, periods],
   );
 
+  // 種目ごとの記録回数（多い順）。上位 MAX_TRAININGS - 1 件以外は「その他」にまとめる
   const byTraining = useMemo<BarDatum[]>(() => {
     const counts = new Map<string, number>();
     logs

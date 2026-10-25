@@ -17,10 +17,17 @@ type ColumnChartProps = {
   showTable: boolean;
 };
 
+/** 棒を描く領域の高さ（x 軸ラベルを除く） */
 const PLOT_HEIGHT = 140;
+/** 棒の太さ（ガイドラインの上限 24px 以下） */
 const COLUMN_WIDTH = 20;
+/** 目盛りの間隔 */
 const TICK_STEP = 2;
 
+/**
+ * 縦棒グラフ（1系列）。棒をタップすると、その値を棒の上に表示する。
+ * showTable が true のときは、同じデータを表で表示する（新しい順）。
+ */
 export default function ColumnChart({
   data,
   unit,
@@ -42,16 +49,19 @@ export default function ColumnChart({
     );
   }
 
+  // y 軸の最大値: 最大値を目盛り間隔の倍数に切り上げる（最低 4）
   const maxValue = Math.max(...data.map((d) => d.value), 0);
   const domainMax = Math.max(4, Math.ceil(maxValue / TICK_STEP) * TICK_STEP);
   const ticks = Array.from(
     { length: domainMax / TICK_STEP + 1 },
     (_, i) => i * TICK_STEP,
   );
+  /** 値 → 下端からの高さ（px） */
   const y = (v: number) => (v / domainMax) * PLOT_HEIGHT;
 
   return (
     <View style={styles.chart}>
+      {/* y 軸の目盛りラベル（文字の高さの半分ずらして目盛り線と中心を揃える） */}
       <View style={styles.yAxis}>
         {ticks.map((t) => (
           <Text key={t} style={[styles.tickLabel, { bottom: y(t) - 7 }]}>
@@ -64,6 +74,7 @@ export default function ColumnChart({
           {ticks.map((t) => (
             <View key={t} style={[styles.gridline, { bottom: y(t) }]} />
           ))}
+          {/* 各棒の列全体をタップ領域にして、細い棒でも押しやすくする */}
           <View style={styles.columns}>
             {data.map((d, i) => {
               const isSelected = i === selected;

@@ -24,6 +24,7 @@ export const Palette = {
   white: '#FFFFFF',
 } as const;
 
+// 影（iOS は shadow*、Android は elevation が使われる）
 export const Shadow = {
   card: {
     shadowColor: Palette.text,

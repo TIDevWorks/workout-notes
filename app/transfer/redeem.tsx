@@ -49,11 +49,17 @@ function CodeInput({
   );
 }
 
+/**
+ * 引き継ぎコードの入力画面。
+ * コードでログインし直すと uid が引き継ぎ元のものに変わり、各画面は useUserId 経由で
+ * 自動的に引き継ぎ元の記録を表示する。
+ */
 export default function RedeemTransferCode() {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  // 区切りや小文字を取り除いた桁数がそろったら「引き継ぐ」を押せるようにする
   const isComplete =
     normalizeCode(id).length === ID_LENGTH &&
     normalizeCode(password).length === PASSWORD_LENGTH;
@@ -73,6 +79,7 @@ export default function RedeemTransferCode() {
     }
   };
 
+  // 今の匿名アカウントの記録は見られなくなるため、実行前に確認する
   const confirm = () =>
     Alert.alert(
       '引き継ぎますか？',

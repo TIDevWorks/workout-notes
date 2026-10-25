@@ -13,8 +13,14 @@ export const unstable_settings = {
   initialRouteName: '(tabs)',
 };
 
+// 初期化（フォント読み込み・ログイン）が終わるまでスプラッシュ画面を表示し続ける
 SplashScreen.preventAutoHideAsync();
 
+/**
+ * アプリ全体のルートレイアウト。
+ * 起動時に匿名ログインと初回データ登録を行い、完了してから画面を表示する。
+ * そのため配下の画面では、ログイン済みであることを前提にできる。
+ */
 export default function RootLayout() {
   const [loaded, error] = useFonts(FontAwesome.font);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -32,6 +38,7 @@ export default function RootLayout() {
           await SplashScreen.hideAsync();
         }
       } catch (e) {
+        // 通信エラーなど。スプラッシュ画面のままアラートを出し、リトライで再実行する
         console.error('App initialization error:', e);
         Alert.alert(
           'エラー',
@@ -48,6 +55,7 @@ export default function RootLayout() {
     return null;
   }
 
+  // 画面の登録。タブ以外の画面（モーダル・引き継ぎ・ポリシー）はタブの上に重ねて表示する
   return (
     <ThemeProvider value={DefaultTheme}>
       <Stack>

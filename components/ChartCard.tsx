@@ -10,6 +10,7 @@ type ChartCardProps = {
   children: ReactNode;
 };
 
+/** グラフを入れるカード（タイトル・補足・右上の操作） */
 export default function ChartCard({
   title,
   subtitle,

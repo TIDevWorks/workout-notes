@@ -5,10 +5,12 @@ import { formatTrainingDetail } from '@/helper/format';
 
 type WorkoutListProps = {
   workouts: WorkoutLog[];
+  /** 読み込み中は空表示を出さない（一瞬「記録はありません」と出るのを防ぐ） */
   loading: boolean;
   error: boolean;
 };
 
+/** Calendar 画面の、選択した日の記録一覧 */
 export default function WorkoutList({
   workouts,
   loading,

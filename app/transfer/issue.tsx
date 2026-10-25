@@ -18,6 +18,7 @@ import {
   transferErrorMessage,
 } from '@/helper/transfer';
 
+/** ID またはパスワードの表示（4文字ずつ区切る。長押しで選択可能） */
 function CodeRow({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.codeRow}>
@@ -29,11 +30,17 @@ function CodeRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+/**
+ * 引き継ぎコードの発行画面。
+ * 未発行なら「発行」、発行済みならそのコードを表示して「再発行」を出す。
+ */
 export default function IssueTransferCode() {
   const [code, setCode] = useState<TransferCode | null>(null);
+  // 保存済みのコードを読み込み中（その間はボタンを出さない）
   const [checking, setChecking] = useState(true);
   const [issuing, setIssuing] = useState(false);
 
+  // 発行済みのコードがあれば表示する
   useEffect(() => {
     loadCurrentTransferCode().then((stored) => {
       setCode(stored);
@@ -41,6 +48,7 @@ export default function IssueTransferCode() {
     });
   }, []);
 
+  // 初回の発行と再発行で共通（どちらになるかは issueTransferCode が判定する）
   const issue = async () => {
     setIssuing(true);
     try {
@@ -63,6 +71,7 @@ export default function IssueTransferCode() {
       ],
     );
 
+  // ID とパスワードをまとめてクリップボードにコピーする
   const copy = async () => {
     if (!code) return;
     await Clipboard.setStringAsync(
