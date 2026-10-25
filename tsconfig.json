@@ -3,6 +3,8 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "strict": true,
+    // テストファイルで describe / expect などのグローバルな型を使う（TypeScript 6 は既定で読み込まない）
+    "types": ["jest"],
     "paths": {
       "@/*": ["./*"],
       "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"]
