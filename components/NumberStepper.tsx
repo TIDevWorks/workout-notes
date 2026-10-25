@@ -16,6 +16,8 @@ type NumberStepperProps = {
   unit?: string;
   /** 小数を入力できるか（重量のみ） */
   decimal?: boolean;
+  /** 小さめの表示（セットごとの入力で2つ横に並べる） */
+  compact?: boolean;
 };
 
 /** 小数の誤差（0.1 + 0.2 など）を消して文字列にする */
@@ -33,6 +35,7 @@ export default function NumberStepper({
   min,
   unit,
   decimal = false,
+  compact = false,
 }: NumberStepperProps) {
   // 入力が数値でない間は min を基準に増減する
   const current = parseNumberInput(value);
@@ -40,14 +43,15 @@ export default function NumberStepper({
   const canDecrease = base - step >= min;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, compact && styles.containerCompact]}>
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.row}>
+      <View style={[styles.row, compact && styles.rowCompact]}>
         <Pressable
           onPress={() => onChange(format(Math.max(min, base - step)))}
           disabled={!canDecrease}
           style={({ pressed }) => [
             styles.button,
+            compact && styles.buttonCompact,
             pressed && styles.buttonPressed,
             !canDecrease && styles.buttonDisabled,
           ]}
@@ -56,9 +60,9 @@ export default function NumberStepper({
         >
           <FontAwesome name="minus" size={14} color={Palette.primary} />
         </Pressable>
-        <View style={styles.inputWrap}>
+        <View style={[styles.inputWrap, compact && styles.inputWrapCompact]}>
           <TextInput
-            style={styles.input}
+            style={[styles.input, compact && styles.inputCompact]}
             value={value}
             onChangeText={onChange}
             keyboardType={decimal ? 'decimal-pad' : 'number-pad'}
@@ -71,6 +75,7 @@ export default function NumberStepper({
           onPress={() => onChange(format(base + step))}
           style={({ pressed }) => [
             styles.button,
+            compact && styles.buttonCompact,
             pressed && styles.buttonPressed,
           ]}
           accessibilityRole="button"
@@ -136,5 +141,25 @@ const styles = StyleSheet.create({
   unit: {
     fontSize: 13,
     color: Palette.textMuted,
+  },
+  containerCompact: {
+    flex: 1,
+    gap: 4,
+  },
+  rowCompact: {
+    gap: 6,
+  },
+  buttonCompact: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+  },
+  inputWrapCompact: {
+    height: 40,
+    borderRadius: 10,
+    paddingHorizontal: 6,
+  },
+  inputCompact: {
+    fontSize: 17,
   },
 });

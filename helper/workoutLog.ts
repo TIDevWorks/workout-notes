@@ -3,6 +3,7 @@ import {
   addDoc,
   collection,
   deleteDoc,
+  deleteField,
   doc,
   DocumentSnapshot,
   onSnapshot,
@@ -14,11 +15,12 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/firebaseConfig';
 import {
+  SetEntry,
   Training,
   WorkoutLog,
-  WorkoutValues,
   trainingName,
 } from '@/constants/training';
+import { toSetEntries } from '@/helper/sets';
 
 const workoutLogsRef = (userId: string) =>
   collection(db, 'users', userId, 'workoutLogs');
@@ -28,10 +30,15 @@ const toWorkoutLog = (snapshot: DocumentSnapshot): WorkoutLog => {
   // 書き込み直後でサーバー時刻が未確定の場合は推定値を使う
   const data = snapshot.data({ serverTimestamps: 'estimate' }) ?? {};
   return {
-    ...data,
     id: snapshot.id,
+    date: data.date,
+    trainingId: data.trainingId,
+    trainingName: data.trainingName,
+    category: data.category,
+    // 古い形式（weight / reps / sets）の記録もここで setEntries に変換する
+    setEntries: toSetEntries(data),
     createdAt: (data.createdAt as Timestamp | null)?.toMillis() ?? 0,
-  } as WorkoutLog;
+  };
 };
 
 /** 指定日の記録を1件追加する */
@@ -39,25 +46,29 @@ export const addWorkoutLog = (
   userId: string,
   date: string,
   training: Training,
-  values: WorkoutValues,
+  setEntries: SetEntry[],
 ) =>
   addDoc(workoutLogsRef(userId), {
     date,
     trainingId: training.id,
     trainingName: trainingName(training),
     category: training.category,
-    ...values,
+    setEntries,
     createdAt: serverTimestamp(),
   });
 
-/** 記録の重量・回数・セット数を変更する */
+/** 記録のセットごとの重量・回数を変更する */
 export const updateWorkoutLog = (
   userId: string,
   logId: string,
-  values: WorkoutValues,
+  setEntries: SetEntry[],
 ) =>
   updateDoc(doc(workoutLogsRef(userId), logId), {
-    ...values,
+    setEntries,
+    // 古い形式の記録を編集した場合は、古いフィールドを消して新しい形式にそろえる
+    weight: deleteField(),
+    reps: deleteField(),
+    sets: deleteField(),
     updatedAt: serverTimestamp(),
   });
 

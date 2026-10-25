@@ -53,15 +53,22 @@ export interface WorkoutLog {
    */
   trainingName?: string;
   category: TrainingCategory;
-  weight: number;
-  reps: number;
-  sets: number;
+  /**
+   * セットごとの重量・回数（1セット目から順に）。
+   * 古い記録は weight / reps / sets の1つの値で保存されているため、読み込み時に変換する
+   * （helper/sets.ts の toSetEntries）
+   */
+  setEntries: SetEntry[];
   /** 作成日時（ミリ秒）。並び順に使う */
   createdAt: number;
 }
 
-/** 記録の値（重量・回数・セット数） */
-export type WorkoutValues = Pick<WorkoutLog, 'weight' | 'reps' | 'sets'>;
+/** 1セット分の記録 */
+export interface SetEntry {
+  /** kg。0 は自重 */
+  weight: number;
+  reps: number;
+}
 
 /**
  * 記録の種目名。種目の今の名前（nameById）を優先し、無ければ記録時の名前、それも無ければ ID。

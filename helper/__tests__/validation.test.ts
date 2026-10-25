@@ -4,8 +4,59 @@ import {
   WEIGHT_MAX,
   parseNumberInput,
   parseWeightInput,
+  validateSetInputs,
   validateWorkoutValues,
 } from '@/helper/validation';
+
+describe('validateSetInputs（記録のセットごとの入力）', () => {
+  test('正しい入力は null', () => {
+    expect(
+      validateSetInputs([
+        { weight: '10', reps: '3' },
+        { weight: '8', reps: '2' },
+      ]),
+    ).toBeNull();
+    // 自重（空欄・0）や全角も受け付ける
+    expect(
+      validateSetInputs([
+        { weight: '', reps: '15' },
+        { weight: '０', reps: '１２' },
+      ]),
+    ).toBeNull();
+  });
+
+  test('何セット目が間違っているかをメッセージに含める', () => {
+    expect(
+      validateSetInputs([
+        { weight: '10', reps: '3' },
+        { weight: '-1', reps: '2' },
+      ]),
+    ).toMatch(/^2セット目: 重量/);
+    expect(
+      validateSetInputs([
+        { weight: '10', reps: '3' },
+        { weight: '8', reps: '2' },
+        { weight: '8', reps: '0' },
+      ]),
+    ).toMatch(/^3セット目: 回数/);
+  });
+
+  test('同じセットに重量と回数の両方の誤りがあれば、重量を先に返す', () => {
+    expect(validateSetInputs([{ weight: 'abc', reps: '' }])).toMatch(
+      /^1セット目: 重量/,
+    );
+  });
+
+  test('セットが0個・多すぎる場合', () => {
+    expect(validateSetInputs([])).toMatch(/1つ以上/);
+    const tooMany = Array.from({ length: SETS_MAX + 1 }, () => ({
+      weight: '10',
+      reps: '1',
+    }));
+    expect(validateSetInputs(tooMany)).toMatch(/セット数/);
+    expect(validateSetInputs(tooMany.slice(0, SETS_MAX))).toBeNull();
+  });
+});
 
 describe('parseNumberInput', () => {
   test('半角の整数・小数', () => {

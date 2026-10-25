@@ -106,12 +106,15 @@ firestore.rules           Firestore のセキュリティルール
 ```
 users/{uid}                     ユーザー（initialized, defaultsVersion, createdAt）
   trainingList/{trainingId}     種目（name, category, defaultWeight, defaultReps, defaultSets, order, custom, edited, deleted）
-  workoutLogs/{logId}           記録（date: YYYY-MM-DD, trainingId, trainingName, category, weight, reps, sets, createdAt）
+  workoutLogs/{logId}           記録（date: YYYY-MM-DD, trainingId, trainingName, category, setEntries, createdAt）
 ```
+
+`setEntries` はセットごとの重量・回数の配列です（例: `[{ weight: 10, reps: 3 }, { weight: 8, reps: 2 }]`）。
 
 - **ユーザー**: 起動時に匿名ログインし、Firebase Auth の `uid` でデータを分けています。
 - **種目の削除**は論理削除（`deleted: true`）です。過去の記録の種目名を表示するため、データは残します。
 - **記録**には記録した時点の種目名（`trainingName`）も保存します。表示は種目の今の名前を優先します。
+- **古い形式の記録**（`weight` / `reps` / `sets` の1つの値）は、読み込み時に「同じ重量・回数のセットが `sets` 個」として扱います（[`helper/sets.ts`](./helper/sets.ts) の `toSetEntries`）。編集して保存すると新しい形式に置き換わります。
 
 ## 仕組みのメモ
 

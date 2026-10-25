@@ -5,23 +5,24 @@ import { router, useLocalSearchParams } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import CategorySegment from '@/components/CategorySegment';
 import TrainingList from '@/components/TrainingList';
-import WorkoutValuesForm from '@/components/WorkoutValuesForm';
+import SetsForm from '@/components/SetsForm';
 import { Palette } from '@/constants/Colors';
 import {
   Training,
+  SetEntry,
   TrainingCategory,
-  WorkoutValues,
   trainingCategoryMeta,
   trainingName,
 } from '@/constants/training';
 import { formatDayLabel, toDateString } from '@/helper/format';
+import { defaultSetEntries } from '@/helper/sets';
 import { addWorkoutLog } from '@/helper/workoutLog';
 import { useTrainings } from '@/hooks/useTrainings';
 import { useUserId } from '@/hooks/useUserId';
 
 // Select Workout モーダル。2段階で記録を追加する。
 //   1. カテゴリを切り替えて種目を選ぶ（+ を押す）
-//   2. 重量・回数・セット数を入力して「記録する」
+//   2. セットごとの重量・回数を入力して「記録する」
 // Add Workout ボタンから、記録する日付を URL パラメータ（date）で受け取る。
 
 export default function WorkoutList() {
@@ -37,10 +38,10 @@ export default function WorkoutList() {
   const date = params.date ?? today;
 
   /** 「記録する」を押したとき: 入力した値で記録を追加して閉じる */
-  const handleRecord = (training: Training) => (values: WorkoutValues) => {
+  const handleRecord = (training: Training) => (sets: SetEntry[]) => {
     if (!userId) return;
     // 画面には書き込み完了を待たずに反映されるため、先に閉じる
-    addWorkoutLog(userId, date, training, values).catch((e) => {
+    addWorkoutLog(userId, date, training, sets).catch((e) => {
       console.error('Failed to add workout log:', e);
       Alert.alert('エラー', '記録の保存に失敗しました。');
     });
@@ -78,13 +79,9 @@ export default function WorkoutList() {
       </View>
 
       {selected ? (
-        <WorkoutValuesForm
+        <SetsForm
           key={selected.id}
-          initialValues={{
-            weight: selected.defaultWeight,
-            reps: selected.defaultReps,
-            sets: selected.defaultSets,
-          }}
+          initialSets={defaultSetEntries(selected)}
           submitLabel="記録する"
           errorMessage="記録の保存に失敗しました。"
           onSubmit={handleRecord(selected)}

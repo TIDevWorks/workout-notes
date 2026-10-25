@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
-import WorkoutValuesForm from '@/components/WorkoutValuesForm';
+import SetsForm from '@/components/SetsForm';
 import { Palette } from '@/constants/Colors';
 import { trainingCategoryMeta, workoutLogName } from '@/constants/training';
 import { formatDayLabel, toDateString } from '@/helper/format';
@@ -11,7 +11,8 @@ import { useUserId } from '@/hooks/useUserId';
 import { useWorkoutLog } from '@/hooks/useWorkoutLog';
 
 /**
- * 記録の編集画面（/logs/{記録 ID}）。重量・回数・セット数の変更と、記録の削除ができる。
+ * 記録の編集画面（/logs/{記録 ID}）。セットごとの重量・回数の変更（セットの追加・削除を含む）と、
+ * 記録の削除ができる。
  * Calendar 画面のリストで記録をタップすると開く。
  */
 export default function EditWorkoutLog() {
@@ -60,14 +61,14 @@ export default function EditWorkoutLog() {
 
   return (
     <View style={styles.container}>
-      <WorkoutValuesForm
+      <SetsForm
         // 読み込み完了後に初期値を入れるため、記録ごとにフォームを作り直す
         key={log.id}
-        initialValues={{ weight: log.weight, reps: log.reps, sets: log.sets }}
+        initialSets={log.setEntries}
         submitLabel="保存する"
         errorMessage="記録の保存に失敗しました。"
-        onSubmit={async (values) => {
-          await updateWorkoutLog(userId, log.id, values);
+        onSubmit={async (sets) => {
+          await updateWorkoutLog(userId, log.id, sets);
           router.back();
         }}
         header={

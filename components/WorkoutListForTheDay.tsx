@@ -6,7 +6,7 @@ import {
   trainingCategoryMeta,
   workoutLogName,
 } from '@/constants/training';
-import { formatTrainingDetail } from '@/helper/format';
+import { formatSetsDetail } from '@/helper/sets';
 
 type WorkoutListProps = {
   workouts: WorkoutLog[];
@@ -56,11 +56,7 @@ export default function WorkoutList({
                 {workoutLogName(workout, nameById)}
               </Text>
               <Text style={styles.detail}>
-                {formatTrainingDetail(
-                  workout.weight,
-                  workout.reps,
-                  workout.sets,
-                )}
+                {formatSetsDetail(workout.setEntries)}
               </Text>
             </View>
             <Text style={styles.tag}>{category.label}</Text>
