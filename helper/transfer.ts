@@ -36,9 +36,13 @@ const randomString = (length: number) =>
 
 const toEmail = (id: string) => `${id.toLowerCase()}@${EMAIL_DOMAIN}`;
 
-/** 入力の揺れ（小文字・空白・ハイフン）を取り除く */
+/** 入力の揺れ（全角・小文字・空白・ハイフン）を取り除く */
 export const normalizeCode = (input: string) =>
-  input.toUpperCase().replace(/[^0-9A-Z]/g, '');
+  input
+    // 全角の英数字・記号（日本語入力のまま打った場合）を半角にする
+    .replace(/[！-～]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
+    .toUpperCase()
+    .replace(/[^0-9A-Z]/g, '');
 
 /** 4 文字ごとにハイフンで区切る（例: K7QF-2MXD-9PRA） */
 export const formatCode = (code: string) =>
