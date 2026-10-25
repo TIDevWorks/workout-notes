@@ -1,6 +1,6 @@
 // components/TrainingList.tsx
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { ScrollView, View, Text, StyleSheet } from 'react-native';
+import { Pressable, ScrollView, View, Text, StyleSheet } from 'react-native';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/firebaseConfig';
 import { useEffect, useState } from 'react';
@@ -11,9 +11,14 @@ import { formatTrainingDetail } from '@/helper/format';
 interface TrainingListProps {
   category: TrainingCategory;
   userId: string;
+  onAdd: (training: Training) => void;
 }
 
-export default function TrainingList({ category, userId }: TrainingListProps) {
+export default function TrainingList({
+  category,
+  userId,
+  onAdd,
+}: TrainingListProps) {
   const [trainings, setTrainings] = useState<Training[]>([]);
 
   useEffect(() => {
@@ -47,9 +52,16 @@ export default function TrainingList({ category, userId }: TrainingListProps) {
               )}
             </Text>
           </View>
-          <View style={styles.addCircle}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.addCircle,
+              pressed && styles.addCirclePressed,
+            ]}
+            onPress={() => onAdd(training)}
+            hitSlop={6}
+          >
             <FontAwesome name="plus" size={14} color={Palette.primary} />
-          </View>
+          </Pressable>
         </View>
       ))}
     </ScrollView>
@@ -94,5 +106,8 @@ const styles = StyleSheet.create({
     backgroundColor: Palette.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  addCirclePressed: {
+    opacity: 0.6,
   },
 });

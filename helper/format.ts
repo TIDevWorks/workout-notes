@@ -13,6 +13,15 @@ export const parseDateString = (dateString: string) => {
   return new Date(y, m - 1, d);
 };
 
+/** 月の最初と最後の日付（YYYY-MM-DD）。month は 1〜12 */
+export const monthRange = (year: number, month: number) => {
+  const lastDay = new Date(year, month, 0).getDate();
+  return {
+    start: `${year}-${pad(month)}-01`,
+    end: `${year}-${pad(month)}-${pad(lastDay)}`,
+  };
+};
+
 /** 例: 10月25日（日）・今日 */
 export const formatDayLabel = (dateString: string, today: string) => {
   const date = parseDateString(dateString);

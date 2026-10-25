@@ -1,14 +1,19 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Palette, Shadow } from '@/constants/Colors';
-import { WorkoutRecord } from '@/constants/dummyWorkoutLog';
-import { trainingCategoryMeta } from '@/constants/training';
+import { WorkoutLog, trainingCategoryMeta } from '@/constants/training';
 import { formatTrainingDetail } from '@/helper/format';
 
 type WorkoutListProps = {
-  workouts: WorkoutRecord[];
+  workouts: WorkoutLog[];
+  loading: boolean;
+  error: boolean;
 };
 
-export default function WorkoutList({ workouts }: WorkoutListProps) {
+export default function WorkoutList({
+  workouts,
+  loading,
+  error,
+}: WorkoutListProps) {
   return (
     <ScrollView
       style={styles.scroll}
@@ -18,12 +23,12 @@ export default function WorkoutList({ workouts }: WorkoutListProps) {
       {workouts.map((workout) => {
         const category = trainingCategoryMeta[workout.category];
         return (
-          <View key={workout.name} style={styles.card}>
+          <View key={workout.id} style={styles.card}>
             <View
               style={[styles.categoryBar, { backgroundColor: category.color }]}
             />
             <View style={styles.texts}>
-              <Text style={styles.name}>{workout.name}</Text>
+              <Text style={styles.name}>{workout.trainingId}</Text>
               <Text style={styles.detail}>
                 {formatTrainingDetail(
                   workout.weight,
@@ -36,9 +41,11 @@ export default function WorkoutList({ workouts }: WorkoutListProps) {
           </View>
         );
       })}
-      {workouts.length === 0 && (
+      {!loading && workouts.length === 0 && (
         <View style={styles.empty}>
-          <Text style={styles.emptyText}>この日の記録はありません</Text>
+          <Text style={styles.emptyText}>
+            {error ? '記録を読み込めませんでした' : 'この日の記録はありません'}
+          </Text>
         </View>
       )}
     </ScrollView>

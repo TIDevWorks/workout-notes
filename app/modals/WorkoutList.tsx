@@ -1,11 +1,17 @@
 // modals/WorkoutList.tsx
 import { useState } from 'react';
-import { StyleSheet, Pressable, Text, View } from 'react-native';
-import { router } from 'expo-router';
+import { Alert, StyleSheet, Pressable, Text, View } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Palette } from '@/constants/Colors';
 import { auth } from '@/firebaseConfig';
-import { TrainingCategory, trainingCategoryMeta } from '@/constants/training';
+import {
+  Training,
+  TrainingCategory,
+  trainingCategoryMeta,
+} from '@/constants/training';
 import TrainingList from '@/components/TrainingList';
+import { toDateString } from '@/helper/format';
+import { addWorkoutLog } from '@/helper/workoutLog';
 
 const TABS: TrainingCategory[] = ['bodyweight', 'machine', 'freeWeights'];
 
@@ -32,6 +38,18 @@ export default function WorkoutList() {
   const [activeTab, setActiveTab] = useState<TrainingCategory>('freeWeights');
   // ルートレイアウトでログイン完了後にしか表示されないため、常に存在する
   const userId = auth.currentUser?.uid;
+  const params = useLocalSearchParams<{ date?: string }>();
+  const date = params.date ?? toDateString(new Date());
+
+  const handleAdd = (training: Training) => {
+    if (!userId) return;
+    // 画面には書き込み完了を待たずに反映されるため、先に閉じる
+    addWorkoutLog(userId, date, training).catch((e) => {
+      console.error('Failed to add workout log:', e);
+      Alert.alert('エラー', '記録の保存に失敗しました。');
+    });
+    router.back();
+  };
 
   return (
     <View style={styles.container}>
@@ -58,7 +76,9 @@ export default function WorkoutList() {
           />
         ))}
       </View>
-      {userId && <TrainingList category={activeTab} userId={userId} />}
+      {userId && (
+        <TrainingList category={activeTab} userId={userId} onAdd={handleAdd} />
+      )}
     </View>
   );
 }

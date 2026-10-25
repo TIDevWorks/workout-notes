@@ -6,14 +6,28 @@ import AddWorkoutButton from '@/components/AddWorkoutButton';
 import Calendar from '@/components/Calendar';
 import WorkoutList from '@/components/WorkoutListForTheDay';
 import { Palette } from '@/constants/Colors';
-import { dummyWorkoutLog } from '@/constants/dummyWorkoutLog';
-import { formatDayLabel, toDateString } from '@/helper/format';
+import { auth } from '@/firebaseConfig';
+import { formatDayLabel, monthRange, toDateString } from '@/helper/format';
+import { useWorkoutLogs } from '@/hooks/useWorkoutLogs';
 
 export default function Index() {
+  const userId = auth.currentUser?.uid;
   const today = useMemo(() => toDateString(new Date()), []);
   const [selectedDate, setSelectedDate] = useState(today);
-  const workouts = dummyWorkoutLog[selectedDate] ?? [];
-  const markedDateStrings = useMemo(() => Object.keys(dummyWorkoutLog), []);
+  const [visibleMonth, setVisibleMonth] = useState(() => {
+    const now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() + 1 };
+  });
+
+  // カレンダーのドット用（表示中の月）と、選択日のリスト用
+  const { start, end } = monthRange(visibleMonth.year, visibleMonth.month);
+  const monthLogs = useWorkoutLogs(userId, start, end);
+  const dayLogs = useWorkoutLogs(userId, selectedDate, selectedDate);
+  const workouts = dayLogs.logs;
+  const markedDateStrings = useMemo(
+    () => [...new Set(monthLogs.logs.map((log) => log.date))],
+    [monthLogs.logs],
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -28,6 +42,7 @@ export default function Index() {
         selectedDate={selectedDate}
         markedDateStrings={markedDateStrings}
         onSelectDate={setSelectedDate}
+        onMonthChange={(year, month) => setVisibleMonth({ year, month })}
       />
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>
@@ -37,8 +52,12 @@ export default function Index() {
           <Text style={styles.count}>{`${workouts.length} 種目`}</Text>
         )}
       </View>
-      <WorkoutList workouts={workouts} />
-      <AddWorkoutButton />
+      <WorkoutList
+        workouts={workouts}
+        loading={dayLogs.loading}
+        error={dayLogs.error}
+      />
+      <AddWorkoutButton date={selectedDate} />
     </SafeAreaView>
   );
 }

@@ -3,9 +3,14 @@ import { Link } from 'expo-router';
 import { Pressable, StyleSheet, View, Text } from 'react-native';
 import { Palette, Shadow } from '@/constants/Colors';
 
-const AddWorkoutButton = () => {
+type AddWorkoutButtonProps = {
+  /** 記録を追加する日付（YYYY-MM-DD） */
+  date: string;
+};
+
+const AddWorkoutButton = ({ date }: AddWorkoutButtonProps) => {
   return (
-    <Link href="/modals/WorkoutList" asChild>
+    <Link href={{ pathname: '/modals/WorkoutList', params: { date } }} asChild>
       <Pressable
         style={({ pressed }) => [
           styles.button,

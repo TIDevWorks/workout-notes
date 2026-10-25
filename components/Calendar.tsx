@@ -12,6 +12,8 @@ type CalendarProps = {
   selectedDate: string;
   markedDateStrings: string[];
   onSelectDate: (dateString: string) => void;
+  /** 表示中の月が変わったとき（month は 1〜12） */
+  onMonthChange: (year: number, month: number) => void;
 };
 
 type HeaderProps = {
@@ -154,6 +156,7 @@ export default function Calendar({
   selectedDate,
   markedDateStrings,
   onSelectDate,
+  onMonthChange,
 }: CalendarProps) {
   const { Header, Day, minDate } = useMemo(() => {
     const min = parseDateString(today);
@@ -185,6 +188,9 @@ export default function Calendar({
         dayComponent={Day}
         markedDates={markedDates}
         onDayPress={(day: DateData) => onSelectDate(day.dateString)}
+        onMonthChange={(month: DateData) =>
+          onMonthChange(month.year, month.month)
+        }
         style={styles.calendar}
         theme={{
           calendarBackground: Palette.surface,
