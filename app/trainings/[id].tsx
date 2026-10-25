@@ -1,4 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import TrainingForm from '@/components/TrainingForm';
 import { Palette } from '@/constants/Colors';
@@ -16,8 +17,10 @@ export default function EditTraining() {
   const userId = useUserId();
   const { trainings, loading } = useTrainings(userId);
   const training = trainings.find((t) => t.id === id);
+  // 削除すると一覧から先に消えるため、その間に「見つかりませんでした」が出ないようにする
+  const [deleting, setDeleting] = useState(false);
 
-  if (loading) return <View style={styles.container} />;
+  if (loading || deleting) return <View style={styles.container} />;
   // 削除済み、または存在しない ID
   if (!training || !userId) {
     return (
@@ -37,10 +40,12 @@ export default function EditTraining() {
           text: '削除',
           style: 'destructive',
           onPress: async () => {
+            setDeleting(true);
             try {
               await deleteTraining(userId, training.id);
               router.back();
             } catch (e) {
+              setDeleting(false);
               console.error('Failed to delete training:', e);
               Alert.alert('エラー', '種目の削除に失敗しました。');
             }

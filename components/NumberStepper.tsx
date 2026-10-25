@@ -40,7 +40,8 @@ export default function NumberStepper({
   // 入力が数値でない間は min を基準に増減する
   const current = parseNumberInput(value);
   const base = Number.isFinite(current) ? current : min;
-  const canDecrease = base - step >= min;
+  // min より大きければ押せる（押したときは min で止まる。例: 2kg から − で 0kg）
+  const canDecrease = base > min;
 
   return (
     <View style={[styles.container, compact && styles.containerCompact]}>

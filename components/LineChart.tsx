@@ -40,6 +40,11 @@ export default function LineChart({ data, unit, showTable }: LineChartProps) {
   const [width, setWidth] = useState(0);
   const [selected, setSelected] = useState(data.length - 1);
 
+  // 表示できる点がない（例: 推定1RM が計算できない記録だけ）場合。以降の計算は1点以上が前提
+  if (data.length === 0) {
+    return <Text style={styles.empty}>表示できる記録がありません。</Text>;
+  }
+
   if (showTable) {
     return (
       <View>
@@ -256,6 +261,12 @@ const styles = StyleSheet.create({
     color: Palette.textMuted,
     textAlign: 'center',
     fontVariant: ['tabular-nums'],
+  },
+  empty: {
+    fontSize: 13,
+    color: Palette.textMuted,
+    textAlign: 'center',
+    paddingVertical: 24,
   },
   tableRow: {
     flexDirection: 'row',
