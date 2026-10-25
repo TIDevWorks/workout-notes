@@ -2,13 +2,22 @@ import Colors from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Pressable } from 'react-native';
+import { ColorValue, Pressable } from 'react-native';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
+  color: ColorValue;
 }) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+  const { name, color } = props;
+  // React Navigation は常に文字列の色を渡すため string として扱う
+  return (
+    <FontAwesome
+      size={28}
+      style={{ marginBottom: -3 }}
+      name={name}
+      color={color as string}
+    />
+  );
 }
 
 export default function TabLayout() {
