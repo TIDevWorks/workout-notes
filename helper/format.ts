@@ -13,6 +13,23 @@ export const parseDateString = (dateString: string) => {
   return new Date(y, m - 1, d);
 };
 
+/** dateString から days 日後（負なら前）の日付 */
+export const addDays = (dateString: string, days: number) => {
+  const date = parseDateString(dateString);
+  date.setDate(date.getDate() + days);
+  return toDateString(date);
+};
+
+/** その週の日曜日（カレンダーと同じ日曜始まり） */
+export const startOfWeek = (dateString: string) =>
+  addDays(dateString, -parseDateString(dateString).getDay());
+
+/** 例: 10/25 */
+export const formatShortDate = (dateString: string) => {
+  const date = parseDateString(dateString);
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+};
+
 /** 月の最初と最後の日付（YYYY-MM-DD）。month は 1〜12 */
 export const monthRange = (year: number, month: number) => {
   const lastDay = new Date(year, month, 0).getDate();

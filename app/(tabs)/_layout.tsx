@@ -42,6 +42,7 @@ export default function TabLayout() {
         name="ChartPage"
         options={{
           title: 'Chart',
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="line-chart" color={color} />
           ),
