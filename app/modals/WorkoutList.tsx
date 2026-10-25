@@ -1,33 +1,25 @@
 // modals/WorkoutList.tsx
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Pressable, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { Palette } from '@/constants/Colors';
-import { TrainingCategory } from '@/constants/training';
+import { TrainingCategory, trainingCategoryMeta } from '@/constants/training';
 import TrainingList from '@/components/TrainingList';
 
-const TabContext = createContext<{
-  activeTab: TrainingCategory;
-  setActiveTab: (tab: TrainingCategory) => void;
-}>({
-  activeTab: 'freeWeights',
-  setActiveTab: () => {},
-});
+const TABS: TrainingCategory[] = ['bodyweight', 'machine', 'freeWeights'];
 
 type TabProps = {
   label: string;
-  value: TrainingCategory;
+  isActive: boolean;
+  onPress: () => void;
 };
 
-function TabButton({ label, value }: TabProps) {
-  const { activeTab, setActiveTab } = useContext(TabContext);
-  const isActive = activeTab === value;
-
+function TabButton({ label, isActive, onPress }: TabProps) {
   return (
     <Pressable
       style={[styles.segment, isActive && styles.activeSegment]}
-      onPress={() => setActiveTab(value)}
+      onPress={onPress}
     >
       <Text style={[styles.segmentText, isActive && styles.activeSegmentText]}>
         {label}
@@ -49,29 +41,32 @@ export default function WorkoutList() {
   }, []);
 
   return (
-    <TabContext.Provider value={{ activeTab, setActiveTab }}>
-      <View style={styles.container}>
-        <View style={styles.grabberRow}>
-          <View style={styles.grabber} />
-        </View>
-        <View style={styles.titleRow}>
-          <Text style={styles.title}>Select Workout</Text>
-          <Pressable onPress={() => router.back()} hitSlop={8}>
-            {({ pressed }) => (
-              <Text style={[styles.close, pressed && styles.closePressed]}>
-                閉じる
-              </Text>
-            )}
-          </Pressable>
-        </View>
-        <View style={styles.segmentContainer}>
-          <TabButton label="Bodyweight" value="bodyweight" />
-          <TabButton label="Machine" value="machine" />
-          <TabButton label="Free Weights" value="freeWeights" />
-        </View>
-        {userId && <TrainingList category={activeTab} userId={userId} />}
+    <View style={styles.container}>
+      <View style={styles.grabberRow}>
+        <View style={styles.grabber} />
       </View>
-    </TabContext.Provider>
+      <View style={styles.titleRow}>
+        <Text style={styles.title}>Select Workout</Text>
+        <Pressable onPress={() => router.back()} hitSlop={8}>
+          {({ pressed }) => (
+            <Text style={[styles.close, pressed && styles.closePressed]}>
+              閉じる
+            </Text>
+          )}
+        </Pressable>
+      </View>
+      <View style={styles.segmentContainer}>
+        {TABS.map((tab) => (
+          <TabButton
+            key={tab}
+            label={trainingCategoryMeta[tab].label}
+            isActive={activeTab === tab}
+            onPress={() => setActiveTab(tab)}
+          />
+        ))}
+      </View>
+      {userId && <TrainingList category={activeTab} userId={userId} />}
+    </View>
   );
 }
 
