@@ -14,7 +14,6 @@ import ColumnChart, { ColumnDatum } from '@/components/ColumnChart';
 import StatTile from '@/components/StatTile';
 import { Palette } from '@/constants/Colors';
 import { WorkoutLog } from '@/constants/training';
-import { auth } from '@/firebaseConfig';
 import {
   addDays,
   formatShortDate,
@@ -23,6 +22,7 @@ import {
   startOfWeek,
   toDateString,
 } from '@/helper/format';
+import { useUserId } from '@/hooks/useUserId';
 import { useWorkoutLogs } from '@/hooks/useWorkoutLogs';
 
 const WEEKS = 8;
@@ -36,7 +36,7 @@ const inRange = (log: WorkoutLog, start: string, end: string) =>
   log.date >= start && log.date <= end;
 
 export default function ChartPage() {
-  const userId = auth.currentUser?.uid;
+  const userId = useUserId();
   const today = useMemo(() => toDateString(new Date()), []);
   const [showTable, setShowTable] = useState(false);
 

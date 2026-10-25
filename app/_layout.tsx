@@ -61,6 +61,18 @@ export default function RootLayout() {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="transfer/issue"
+          options={{ title: '引き継ぎコードの発行', headerBackTitle: '戻る' }}
+        />
+        <Stack.Screen
+          name="transfer/redeem"
+          options={{ title: '引き継ぎコードの入力', headerBackTitle: '戻る' }}
+        />
+        <Stack.Screen
+          name="privacy-policy"
+          options={{ title: 'プライバシーポリシー', headerBackTitle: '戻る' }}
+        />
       </Stack>
     </ThemeProvider>
   );

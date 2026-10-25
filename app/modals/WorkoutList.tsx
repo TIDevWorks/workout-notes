@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Alert, StyleSheet, Pressable, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Palette } from '@/constants/Colors';
-import { auth } from '@/firebaseConfig';
+import { useUserId } from '@/hooks/useUserId';
 import {
   Training,
   TrainingCategory,
@@ -36,8 +36,7 @@ function TabButton({ label, isActive, onPress }: TabProps) {
 
 export default function WorkoutList() {
   const [activeTab, setActiveTab] = useState<TrainingCategory>('freeWeights');
-  // ルートレイアウトでログイン完了後にしか表示されないため、常に存在する
-  const userId = auth.currentUser?.uid;
+  const userId = useUserId();
   const params = useLocalSearchParams<{ date?: string }>();
   const date = params.date ?? toDateString(new Date());
 

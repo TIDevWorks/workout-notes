@@ -33,6 +33,7 @@ export default function TabLayout() {
         name="OtherPage"
         options={{
           title: 'Other',
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="info-circle" color={color} />
           ),

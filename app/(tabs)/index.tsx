@@ -6,12 +6,12 @@ import AddWorkoutButton from '@/components/AddWorkoutButton';
 import Calendar from '@/components/Calendar';
 import WorkoutList from '@/components/WorkoutListForTheDay';
 import { Palette } from '@/constants/Colors';
-import { auth } from '@/firebaseConfig';
 import { formatDayLabel, monthRange, toDateString } from '@/helper/format';
+import { useUserId } from '@/hooks/useUserId';
 import { useWorkoutLogs } from '@/hooks/useWorkoutLogs';
 
 export default function Index() {
-  const userId = auth.currentUser?.uid;
+  const userId = useUserId();
   const today = useMemo(() => toDateString(new Date()), []);
   const [selectedDate, setSelectedDate] = useState(today);
   const [visibleMonth, setVisibleMonth] = useState(() => {
