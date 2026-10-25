@@ -25,6 +25,24 @@ export default function Index() {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() + 1 };
   });
+  // 「今日」ボタンでカレンダーを作り直して今月に戻すためのキー
+  const [calendarKey, setCalendarKey] = useState(0);
+
+  // 今日を選択していて、今月を表示している（＝戻る必要がない）か
+  const isShowingToday = useMemo(() => {
+    const now = new Date();
+    return (
+      selectedDate === today &&
+      visibleMonth.year === now.getFullYear() &&
+      visibleMonth.month === now.getMonth() + 1
+    );
+  }, [selectedDate, today, visibleMonth]);
+
+  const goToToday = () => {
+    setSelectedDate(today);
+    // カレンダーは initialDate が変わったときしか月を切り替えないため、作り直して今月を表示する
+    setCalendarKey((k) => k + 1);
+  };
 
   // カレンダーのドット用（表示中の月）と、選択日のリスト用
   const { start, end } = monthRange(visibleMonth.year, visibleMonth.month);
@@ -43,12 +61,36 @@ export default function Index() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.title}>Calendar</Text>
-        {/* TODO: 押したときの動作は未定 */}
-        <Pressable style={styles.infoButton}>
-          <FontAwesome name="info-circle" size={16} color={Palette.textMuted} />
+        {/* 今日以外を見ているときだけ押せる */}
+        <Pressable
+          onPress={goToToday}
+          disabled={isShowingToday}
+          style={({ pressed }) => [
+            styles.todayButton,
+            pressed && styles.todayButtonPressed,
+          ]}
+          hitSlop={6}
+          accessibilityRole="button"
+          accessibilityLabel="今日に戻る"
+          accessibilityState={{ disabled: isShowingToday }}
+        >
+          <FontAwesome
+            name="calendar-check-o"
+            size={14}
+            color={isShowingToday ? Palette.textDisabled : Palette.primary}
+          />
+          <Text
+            style={[
+              styles.todayText,
+              isShowingToday && styles.todayTextDisabled,
+            ]}
+          >
+            今日
+          </Text>
         </Pressable>
       </View>
       <Calendar
+        key={calendarKey}
         today={today}
         selectedDate={selectedDate}
         markedDateStrings={markedDateStrings}
@@ -93,18 +135,30 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
     color: Palette.text,
   },
-  infoButton: {
-    width: 36,
+  todayButton: {
     height: 36,
     borderRadius: 18,
-    backgroundColor: Palette.surface,
+    paddingHorizontal: 14,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: Palette.surface,
     shadowColor: Palette.text,
     shadowOpacity: 0.08,
     shadowRadius: 2,
     shadowOffset: { width: 0, height: 1 },
     elevation: 1,
+  },
+  todayButtonPressed: {
+    backgroundColor: Palette.surfaceMuted,
+  },
+  todayText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Palette.primary,
+  },
+  todayTextDisabled: {
+    color: Palette.textDisabled,
   },
   sectionHeader: {
     flexDirection: 'row',
