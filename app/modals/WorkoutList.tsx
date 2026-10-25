@@ -1,9 +1,9 @@
 // modals/WorkoutList.tsx
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { StyleSheet, Pressable, Text, View } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { Palette } from '@/constants/Colors';
+import { auth } from '@/firebaseConfig';
 import { TrainingCategory, trainingCategoryMeta } from '@/constants/training';
 import TrainingList from '@/components/TrainingList';
 
@@ -30,15 +30,8 @@ function TabButton({ label, isActive, onPress }: TabProps) {
 
 export default function WorkoutList() {
   const [activeTab, setActiveTab] = useState<TrainingCategory>('freeWeights');
-  const [userId, setUserId] = useState<string>('');
-
-  useEffect(() => {
-    const getUserId = async () => {
-      const uuid = await AsyncStorage.getItem('@uuid');
-      if (uuid) setUserId(uuid);
-    };
-    getUserId();
-  }, []);
+  // ルートレイアウトでログイン完了後にしか表示されないため、常に存在する
+  const userId = auth.currentUser?.uid;
 
   return (
     <View style={styles.container}>
